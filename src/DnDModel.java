@@ -16,12 +16,17 @@ public class DnDModel {
      * Stores the initiative orders and queue for holding turns
      */
     private Queue<String> initOrd;
-    private Set<String> holds;
+    private Set<String> holds, dead;
 
     /**
      * Turn number
      */
     private int turns;
+
+    /**
+     * Top of the round name.
+     */
+    private String topOfTheRound;
 
     /**
      * Map to hold additional info, such as health.
@@ -34,8 +39,10 @@ public class DnDModel {
     public DnDModel() {
         this.initOrd = new LinkedList<>();
         this.holds = new HashSet<>();
+        this.dead = new HashSet<>();
         this.turns = 1;
         this.healthMap = new HashMap<>();
+        this.topOfTheRound = "";
     }
 
     /**
@@ -46,7 +53,12 @@ public class DnDModel {
      */
     public void addToOrder(String name, int health) {
         this.healthMap.put(name, health);
-        this.initOrd.add(name);
+        if (this.topOfTheRound.length() == 0) {
+            this.topOfTheRound = name;
+        }
+        if (!this.initOrd.contains("Mobs")) {
+            this.initOrd.add("Mobs");
+        }
     }
 
     /*
@@ -54,6 +66,9 @@ public class DnDModel {
      */
     public void addToOrder(String name) {
         this.initOrd.add(name);
+        if (this.topOfTheRound.length() == 0) {
+            this.topOfTheRound = name;
+        }
     }
 
     public String removeLastNameAdded() {
@@ -65,6 +80,17 @@ public class DnDModel {
             this.healthMap.remove(last);
         }
         return last;
+    }
+
+    /**
+     * Moves name from front of initiative order to Hold set.
+     */
+    public void moveToHold() {
+        String name = this.initOrd.remove();
+        if (name.equals(this.topOfTheRound)) {
+            this.topOfTheRound = this.initOrd.peek();
+        }
+        this.holds.add(name);
     }
 
     /**
@@ -80,18 +106,65 @@ public class DnDModel {
         this.turns++;
     }
 
-    public void changeHealth(boolean heal, int health) {
-        //TODO
+    /**
+     * Changes health of a mob.
+     *
+     * @param heal
+     *            if heal = true, heal; else damage
+     * @param health
+     *            amount of damage to deal.
+     */
+    public void changeHealth(boolean heal, int health, String name) {
+        if (heal) {
+            int currentHealth = this.healthMap.get(name);
+            currentHealth += health;
+            this.healthMap.put(name, currentHealth);
+        } else {
+            int currentHealth = this.healthMap.get(name);
+            currentHealth -= health;
+            if (currentHealth <= 0) {
+                this.healthMap.remove(name);
+                this.dead.add(name);
+                name = "*DEAD* " + name;
+                this.healthMap.put(name, 0);
+
+            } else {
+                this.healthMap.put(name, currentHealth);
+            }
+        }
     }
 
     public void holdTurn() {
-        //TODO
+        String name = this.initOrd.remove();
+        if (name.equals(this.topOfTheRound)) {
+            this.topOfTheRound = this.initOrd.peek();
+        }
     }
 
+    /**
+     * Adds player back to top of queue order.
+     * 
+     * @param name
+     *            adds
+     */
     public void insertTurn(String name) {
-        //TODO
+        moveToInitOrd(name, this.holds, this.initOrd);
     }
 
     //Private helper methods
-
+    /**
+     * Adds name back to front of initOrd.
+     *
+     * @param name
+     *            the name to add to {@code initOrd}
+     */
+    private static void moveToInitOrd(String name, Set<String> holds,
+            Queue<String> initOrd) {
+        if (holds.remove(name)) {
+            initOrd.add(name);
+            while (initOrd.peek().equals(name)) {
+                initOrd.add(initOrd.remove());
+            }
+        }
+    }
 }
