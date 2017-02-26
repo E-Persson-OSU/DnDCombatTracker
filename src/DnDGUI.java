@@ -2,8 +2,7 @@
  * Simple GUI application supporting append and undo using a version of the
  * Model-View-Controller (MVC) design pattern including interfaces.
  *
- * @author Bruce W. Weide
- * @author Paolo Bucci
+ * @author E-Persson-OSU
  */
 public final class DnDGUI {
 
@@ -30,7 +29,7 @@ public final class DnDGUI {
         DnDView view = new DnDView();
         DnDController controller = new DnDController(model, view);
 
-        //view.registerObserver(controller);
+        view.registerObserver(controller);
     }
 
 }

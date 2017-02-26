@@ -2,7 +2,7 @@
  * The Controller class registers button actions and calls the appropriate model
  * methods.
  *
- * @author Redse
+ * @author E-Persson-OSU
  *
  */
 public class DnDController {
@@ -38,11 +38,25 @@ public class DnDController {
      *            the DnD view.
      */
     private void updateViewToMatchModel(DnDModel model, DnDView view) {
-        //TODO
+        this.view.clear();
+        view.enableButtons(model.lengthOfInitOrd() > 0);
+        this.view.setTurn(this.model.turn());
     }
 
     /*
      * Process events
      */
+    public void processEnterEvent() {
+        String name = this.view.getName();
+        int health = this.view.getHealth();
+        this.model.enter(name, health);
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processUndoEvent() {
+        String name = this.model.undo();
+        this.view.undone(name);
+        this.updateViewToMatchModel(this.model, this.view);
+    }
 
 }

@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * The model. This stores the data for the program.
  *
- * @author Redse
+ * @author E-Persson-OSU
  *
  */
 public class DnDModel {
@@ -45,13 +45,33 @@ public class DnDModel {
         this.topOfTheRound = "";
     }
 
+    /*
+     * Buttons
+     */
+    public void enter(String name, int health) {
+        if (health == 0) {
+            this.addToOrder(name);
+        } else {
+            this.addToOrder(name, health);
+        }
+    }
+
+    public String undo() {
+        String name = this.removeLastNameAdded();
+        return name;
+    }
+
+    public int lengthOfInitOrd() {
+        return this.initOrd.size();
+    }
+
     /**
      * Methods for setting up initiative order.
      */
     /*
      * Add mob
      */
-    public void addToOrder(String name, int health) {
+    private void addToOrder(String name, int health) {
         this.healthMap.put(name, health);
         if (this.topOfTheRound.length() == 0) {
             this.topOfTheRound = name;
@@ -59,19 +79,23 @@ public class DnDModel {
         if (!this.initOrd.contains("Mobs")) {
             this.initOrd.add("Mobs");
         }
+        //Test statement
+        System.out.println("Mob: " + name + ", Health: " + health
+                + " added successfully!");
     }
 
     /*
      * Add player
      */
-    public void addToOrder(String name) {
+    private void addToOrder(String name) {
         this.initOrd.add(name);
         if (this.topOfTheRound.length() == 0) {
             this.topOfTheRound = name;
         }
+        System.out.println("Player: " + name + " added successfully!");
     }
 
-    public String removeLastNameAdded() {
+    private String removeLastNameAdded() {
         for (int i = 0; i < this.initOrd.size() - 1; i++) {
             this.initOrd.add(this.initOrd.remove());
         }
@@ -104,6 +128,10 @@ public class DnDModel {
 
     public void incrementTurns() {
         this.turns++;
+    }
+
+    public boolean topOfTheRound() {
+        return this.initOrd.peek().equals(this.topOfTheRound);
     }
 
     /**
@@ -143,7 +171,7 @@ public class DnDModel {
 
     /**
      * Adds player back to top of queue order.
-     * 
+     *
      * @param name
      *            adds
      */
