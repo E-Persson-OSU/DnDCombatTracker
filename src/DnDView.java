@@ -27,6 +27,7 @@ import javax.swing.border.Border;
  * @author E-Persson-OSU
  *
  */
+@SuppressWarnings("serial")
 public final class DnDView extends JFrame
         implements ActionListener, MouseListener {
 
@@ -83,11 +84,12 @@ public final class DnDView extends JFrame
     /**
      * Some final fields
      */
-    private final int VERT_GRIDS_ENTER = 2, HOR_GRIDS_ENTER = 1,
-            TEXT_AREA_HEIGHT = 20, TEXT_AREA_WIDTH = 20, ENTER_BUTTON_COLM = 2,
-            ENTER_BUTTON_ROWS = 1, ENTER_MENU_ROWS = 2, ENTER_MENU_COLM = 1,
-            TEXT_FIELD_WIDTH = 15, TEXT_FIELD_HEIGHT = 5,
-            ENTER_INIT_HEIGHT = 192, ENTER_INIT_WIDTH = 512;
+    private final int ENTER_MENU_ROWS = 2, ENTER_MENU_COLM = 1,
+            TEXT_FIELD_WIDTH = 15, ENTER_INIT_HEIGHT = 192,
+            ENTER_INIT_WIDTH = 512;
+    //    private final int VERT_GRIDS_ENTER = 2, HOR_GRIDS_ENTER = 1,
+    //            TEXT_AREA_HEIGHT = 20, TEXT_AREA_WIDTH = 20, ENTER_BUTTON_COLM = 2,
+    //            ENTER_BUTTON_ROWS = 1, TEXT_FIELD_HEIGHT = 5;
     /**
      * Formatting
      */
@@ -196,6 +198,11 @@ public final class DnDView extends JFrame
 
         //Add ActionListener
         this.addActionListenerToButtons();
+
+        //Add MouseListener
+        this.lHolds.addMouseListener(this);
+        this.lMobMenu.addMouseListener(this);
+        this.lTurnOrder.addMouseListener(this);
 
         //JPanels--------------------------------------------------------------
         /*
@@ -306,7 +313,7 @@ public final class DnDView extends JFrame
          * Process action.
          */
         String source = event.getActionCommand();
-        System.out.println(source);
+        //System.out.println(source);
         if (source.equals(this.bEnter.getActionCommand())) {
             this.controller.processEnterEvent();
         } else if (source.equals(this.bFinish.getActionCommand())) {
@@ -326,9 +333,11 @@ public final class DnDView extends JFrame
         } else if (source.equals(this.bHeal.getActionCommand())) {
             this.controller.processHealEvent();
         } else if (source.equals(this.bAddMob.getActionCommand())) {
-            this.controller.processAddMobEvent();
+            this.controller.processAddMobEvent(this.addedMobName(),
+                    this.addedMobHealth());
         } else if (source.equals(this.bRemoveMob.getActionCommand())) {
-            this.controller.processRemoveMobEvent();
+            this.controller
+                    .processRemoveMobEvent(this.lMobMenu.getSelectedIndex());
         }
         //Action done being processed
         this.setCursor(Cursor.getDefaultCursor());
@@ -336,22 +345,24 @@ public final class DnDView extends JFrame
 
     @Override
     public void mouseClicked(MouseEvent event) {
+
         String location = event.getSource().toString();
+        //System.out.println("Click registered: " + location);
         if (location.equals(this.lHolds.toString())) {
             if (event.getClickCount() == 2) {
-                System.out.println("Registered Double Click: Holds");
+                //System.out.println("Registered Double Click: Holds");
                 int index = this.lHolds.locationToIndex(event.getPoint());
                 this.controller.processDoubleClickHolds(index);
             }
         } else if (location.equals(this.lTurnOrder.toString())) {
             if (event.getClickCount() == 2) {
-                System.out.println("Registered Double Click: Order");
+                //System.out.println("Registered Double Click: Order");
                 int index = this.lTurnOrder.locationToIndex(event.getPoint());
                 this.controller.processDoubleClickTurnOrder(index);
             }
         } else if (location.equals(this.lMobMenu.toString())) {
             if (event.getClickCount() == 2) {
-                System.out.println("Registered Double Click: Mob Menu");
+                //System.out.println("Registered Double Click: Mob Menu");
                 int index = this.lMobMenu.locationToIndex(event.getPoint());
                 this.controller.processDoubleClickMobMenu(index);
             }
@@ -396,6 +407,7 @@ public final class DnDView extends JFrame
         this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.ENTER_FRAME.dispose();
         this.MAIN_FRAME.setVisible(true);
+
     }
 
     public String getTurnOrderSelected() {
@@ -408,6 +420,16 @@ public final class DnDView extends JFrame
 
     public void setFocusToName() {
         this.tNames.grabFocus();
+    }
+
+    public String addedMobName() {
+        return JOptionPane.showInputDialog(this.MAIN_FRAME, "Enter Mob Name: ");
+    }
+
+    public int addedMobHealth() {
+        int amount = Integer.parseInt(
+                JOptionPane.showInputDialog(this, "Enter Mob Health:"));
+        return amount;
     }
 
     /**
@@ -439,8 +461,8 @@ public final class DnDView extends JFrame
      * Pull info.
      */
     public String getNameFromField() {
-        String name = this.tNames.getText();
-        System.out.println("Retrieved: " + name);
+        // String name = this.tNames.getText();
+        //System.out.println("Retrieved: " + name);
         return this.tNames.getText();
     }
 

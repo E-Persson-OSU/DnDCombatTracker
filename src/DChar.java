@@ -36,7 +36,11 @@ public class DChar {
     public String toString() {
         String name = this.name;
         if (!this.player) {
-            name = name + ", " + this.health;
+            if (this.health <= 0) {
+                name = name + ", *DEAD*";
+            } else {
+                name = name + ", " + this.health;
+            }
         }
         return name;
     }

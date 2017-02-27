@@ -12,8 +12,8 @@ public class DnDModel {
     /**
      * Stores the initiative orders and queue for holding turns
      */
-    //private Queue<String> initOrd, mobs;
-    private List<DChar> lOrd, lMob, lDead, lHold;
+    //private List<DChar> lDead;
+    private List<DChar> lOrd, lMob, lHold;
 
     /**
      * Turn number
@@ -31,7 +31,7 @@ public class DnDModel {
     public DnDModel() {
         this.lOrd = new LinkedList<>();
         this.lMob = new LinkedList<>();
-        this.lDead = new LinkedList<>();
+        //this.lDead = new LinkedList<>();
         this.lHold = new LinkedList<>();
         this.turns = 1;
         this.enemyIn = false;
@@ -44,9 +44,9 @@ public class DnDModel {
         } else {
             this.addToOrder(name, health);
         }
-        for (DChar ch : this.lOrd) {
-            System.out.println(ch.toString());
-        }
+        //        for (DChar ch : this.lOrd) {
+        //            System.out.println(ch.toString());
+        //        }
     }
 
     public String undo() {
@@ -55,9 +55,9 @@ public class DnDModel {
     }
 
     public List<DChar> finish() {
-        for (DChar ch : this.lOrd) {
-            System.out.println(ch.toString());
-        }
+        //        for (DChar ch : this.lOrd) {
+        //            System.out.println(ch.toString());
+        //        }
         return this.lOrd;
     }
 
@@ -70,6 +70,9 @@ public class DnDModel {
     }
 
     public void heal(int dmg, int pos) {
+        if (pos < 0) {
+            pos = 0;
+        }
         this.lMob.get(pos).changeHealth(dmg);
     }
 
@@ -90,6 +93,17 @@ public class DnDModel {
             this.incrementTurns();
         }
         return this.lOrd;
+    }
+
+    public void addMob(String name, int health) {
+        this.lMob.add(new DChar(name, health));
+    }
+
+    public void removeMob(int pos) {
+        if (pos < 0) {
+            pos = 0;
+        }
+        this.lMob.remove(pos);
     }
 
     //OTHER--------------------------------------------------------------------
@@ -154,6 +168,10 @@ public class DnDModel {
         }
     }
 
+    /*
+     * Add Mob Methods
+     */
+
     /**
      * Add mob
      */
@@ -166,7 +184,7 @@ public class DnDModel {
         if (this.lOrd.size() == 1) {
             this.lOrd.get(0).changeTop();
         }
-        System.out.println("Added Mob: " + name);
+        //System.out.println("Added Mob: " + name);
     }
 
     /**
@@ -177,7 +195,7 @@ public class DnDModel {
         if (this.lOrd.size() == 1) {
             this.lOrd.get(0).changeTop();
         }
-        System.out.println("Added Player: " + name);
+        //System.out.println("Added Player: " + name);
     }
 
     /**
