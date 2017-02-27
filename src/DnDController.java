@@ -1,6 +1,3 @@
-import java.util.LinkedList;
-import java.util.Queue;
-
 /**
  * The Controller class registers button actions and calls the appropriate model
  * methods.
@@ -46,12 +43,8 @@ public class DnDController {
             view.enableButtons(model.lengthOfInitOrd() > 0);
             System.out.println("Updated Enter View.");
         } else {
-            Queue<String> initOrd = new LinkedList<>();
-            for (String str : model.finish()) {
-                initOrd.add(str);
-            }
-            view.updateMobMenu(model.getMobMap(), model.getMobs());
-            view.setInitOrdText(initOrd);
+            view.updateMobMenu(model.getMobList());
+            view.setInitOrdText(model.finish());
             view.setTurn(model.turn());
             System.out.println("Updated Main View.");
 
@@ -75,6 +68,7 @@ public class DnDController {
     }
 
     public void processFinishEvent() {
+        this.view.finish();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
@@ -83,4 +77,47 @@ public class DnDController {
         this.updateViewToMatchModel(this.model, this.view);
     }
 
+    public void processHoldTurnEvent() {
+        this.model.nextPlayer();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processInsertTurnEvent() {
+        this.model.nextPlayer();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processDamageEvent() {
+        this.model.nextPlayer();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processHealEvent() {
+        this.model.nextPlayer();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processAddMobEvent() {
+        this.model.nextPlayer();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processRemoveMobEvent() {
+        this.model.nextPlayer();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processDoubleClickHolds(int pos) {
+        this.model.insertTurn(pos);
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processDoubleClickTurnOrder(int pos) {
+        this.model.holdTurn(pos);
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processDoubleClickMobMenu(int pos) {
+        this.updateViewToMatchModel(this.model, this.view);
+    }
 }
