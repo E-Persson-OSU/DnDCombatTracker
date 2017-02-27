@@ -58,9 +58,8 @@ public class DnDController {
      * Process events
      */
     public void processEnterEvent() {
-        String name = this.view.getNameFromField();
-        int health = this.view.getHealth();
-        this.model.enter(name, health);
+        this.model.enter(this.view.getNameFromField(), this.view.getHealth(),
+                this.view.enterWhere());
         this.view.setFocusToName();
         this.updateViewToMatchModel(this.model, this.view);
     }

@@ -4,6 +4,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.ScrollPane;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -18,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -25,6 +27,7 @@ import javax.swing.border.Border;
  * The view component of the DnDCombatTracker.
  *
  * @author E-Persson-OSU
+ *
  *
  */
 @SuppressWarnings("serial")
@@ -77,6 +80,11 @@ public final class DnDView extends JFrame
             bInsertTurn, bDamage, bHeal, bAddMob, bRemoveMob;
 
     /**
+     * Radio Buttons
+     */
+    private final JRadioButton rbNPC, rbPlayer, rbMob;
+
+    /**
      * Formatting
      */
     private final NumberFormat healthFormat;
@@ -96,6 +104,8 @@ public final class DnDView extends JFrame
     private final Font FONT_HEADER = new Font("SansSerif", Font.BOLD, 20);
     private final Font FONT_PLAIN = new Font("SansSerif", Font.PLAIN, 20);
     private final Border BORDER = BorderFactory.createLineBorder(Color.GRAY);
+
+    int dim = Toolkit.getDefaultToolkit().getScreenResolution();
     /**
      * Controller to interpret commands
      */
@@ -104,7 +114,7 @@ public final class DnDView extends JFrame
     /**
      * Current view: true = enter, false = main.
      */
-    private boolean view;
+    private boolean view, enterPlayer, enterNPC, enterMob;
 
     /**
      * No-argument constructor.
@@ -145,6 +155,9 @@ public final class DnDView extends JFrame
         this.bEnter = new JButton("Enter");
         this.bUndo = new JButton("Undo");
         this.bFinish = new JButton("Finish");
+        this.rbPlayer = new JRadioButton("Player");
+        this.rbNPC = new JRadioButton("NPC");
+        this.rbMob = new JRadioButton("Mob");
 
         //main window buttons
         this.bHoldTurn = new JButton("Hold Turn");
@@ -222,6 +235,8 @@ public final class DnDView extends JFrame
          */
         JPanel enterButtons = new JPanel(new GridLayout(1, 3));
         JPanel enterFields = new JPanel(new GridLayout(2, 2));
+        JPanel enterRadioButtons = new JPanel(new GridLayout(3, 1));
+        JPanel enterTop = new JPanel(new BorderLayout());
 
         /*
          * Panels for main window
@@ -245,6 +260,11 @@ public final class DnDView extends JFrame
         enterFields.add(this.tNames);
         enterFields.add(this.tSpecHealth);
         enterFields.add(this.tHealth);
+        enterRadioButtons.add(this.rbPlayer);
+        enterRadioButtons.add(this.rbNPC);
+        enterRadioButtons.add(this.rbMob);
+        enterTop.add(enterRadioButtons, BorderLayout.WEST);
+        enterTop.add(enterFields);
 
         /*
          * Add buttons and fields for main window
@@ -281,7 +301,7 @@ public final class DnDView extends JFrame
         /*
          * Add panels to enter panel
          */
-        this.ENTER_PANEL.add(enterFields);
+        this.ENTER_PANEL.add(enterTop);
         this.ENTER_PANEL.add(enterButtons);
 
         /*
@@ -296,6 +316,11 @@ public final class DnDView extends JFrame
         this.ENTER_FRAME.pack();
         this.ENTER_FRAME.setSize(this.ENTER_INIT_WIDTH, this.ENTER_INIT_HEIGHT);
         this.ENTER_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.rbPlayer.setSelected(true);
+        this.enterPlayer = true;
+        this.tHealth.setEnabled(false);
+        this.ENTER_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
+                this.dim / 2 - this.getSize().height / 2);
         this.ENTER_FRAME.setVisible(true);
         //Set up main window
 
@@ -314,7 +339,8 @@ public final class DnDView extends JFrame
          */
         String source = event.getActionCommand();
         //System.out.println(source);
-        if (source.equals(this.bEnter.getActionCommand())) {
+        if (source.equals(this.bEnter.getActionCommand())
+                && this.tNames.getText().length() > 0) {
             this.controller.processEnterEvent();
         } else if (source.equals(this.bFinish.getActionCommand())) {
             this.controller.processFinishEvent();
@@ -338,6 +364,33 @@ public final class DnDView extends JFrame
         } else if (source.equals(this.bRemoveMob.getActionCommand())) {
             this.controller
                     .processRemoveMobEvent(this.lMobMenu.getSelectedIndex());
+        } else if (source.equals(this.rbPlayer.getActionCommand())) {
+            this.enterPlayer = true;
+            this.enterNPC = false;
+            this.enterMob = false;
+            this.tHealth.setEnabled(false);
+            this.rbPlayer.setSelected(true);
+            this.rbNPC.setSelected(false);
+            this.rbMob.setSelected(false);
+            this.tNames.grabFocus();
+        } else if (source.equals(this.rbNPC.getActionCommand())) {
+            this.enterPlayer = false;
+            this.enterNPC = true;
+            this.enterMob = false;
+            this.tHealth.setEnabled(true);
+            this.rbPlayer.setSelected(false);
+            this.rbNPC.setSelected(true);
+            this.rbMob.setSelected(false);
+            this.tNames.grabFocus();
+        } else if (source.equals(this.rbMob.getActionCommand())) {
+            this.enterPlayer = false;
+            this.enterNPC = false;
+            this.enterMob = true;
+            this.tHealth.setEnabled(true);
+            this.rbPlayer.setSelected(false);
+            this.rbNPC.setSelected(false);
+            this.rbMob.setSelected(true);
+            this.tNames.grabFocus();
         }
         //Action done being processed
         this.setCursor(Cursor.getDefaultCursor());
@@ -406,6 +459,8 @@ public final class DnDView extends JFrame
         this.MAIN_FRAME.setResizable(true);
         this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.ENTER_FRAME.dispose();
+        this.MAIN_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
+                this.dim / 2 - this.getSize().height / 2);
         this.MAIN_FRAME.setVisible(true);
 
     }
@@ -427,8 +482,8 @@ public final class DnDView extends JFrame
     }
 
     public int addedMobHealth() {
-        int amount = Integer.parseInt(
-                JOptionPane.showInputDialog(this, "Enter Mob Health:"));
+        int amount = Integer.parseInt(JOptionPane
+                .showInputDialog(this.MAIN_FRAME, "Enter Mob Health:"));
         return amount;
     }
 
@@ -446,6 +501,9 @@ public final class DnDView extends JFrame
         this.bDamage.addActionListener(this);
         this.bHeal.addActionListener(this);
         this.bInsertTurn.addActionListener(this);
+        this.rbMob.addActionListener(this);
+        this.rbNPC.addActionListener(this);
+        this.rbPlayer.addActionListener(this);
     }
 
     /**
@@ -487,7 +545,7 @@ public final class DnDView extends JFrame
      * Notify of successful undo.
      */
     public void undone(String name) {
-        JOptionPane.showMessageDialog(this,
+        JOptionPane.showMessageDialog(this.ENTER_FRAME,
                 name + " was successfully removed.");
     }
 
@@ -524,7 +582,7 @@ public final class DnDView extends JFrame
         String[] arr = new String[lOrd.size()];
         int pos = 0;
         for (DChar ch : lOrd) {
-            arr[pos] = ch.toString2();
+            arr[pos] = ch.toStringOrder();
             pos++;
         }
         this.lTurnOrder.setListData(arr);
@@ -544,7 +602,7 @@ public final class DnDView extends JFrame
         String[] arr = new String[lMob.size()];
         int pos = 0;
         for (DChar ch : lMob) {
-            arr[pos] = ch.toString();
+            arr[pos] = ch.toStringMobMenu();
             pos++;
         }
         this.lMobMenu.setListData(arr);
@@ -557,19 +615,31 @@ public final class DnDView extends JFrame
         String[] arr = new String[lHold.size()];
         int pos = 0;
         for (DChar ch : lHold) {
-            arr[pos] = ch.toString();
+            arr[pos] = ch.toStringHolds();
             pos++;
         }
         this.lHolds.setListData(arr);
     }
 
     public int healthDialog() {
-        int amount = Integer
-                .parseInt(JOptionPane.showInputDialog(this, "Enter Amount:"));
+        int amount = Integer.parseInt(
+                JOptionPane.showInputDialog(this.MAIN_FRAME, "Enter Amount:"));
         return amount;
     }
 
     public int getMobSelected() {
         return this.lMobMenu.getSelectedIndex();
+    }
+
+    public String enterWhere() {
+        String where = "";
+        if (this.enterPlayer) {
+            where = "player";
+        } else if (this.enterNPC) {
+            where = "npc";
+        } else if (this.enterMob) {
+            where = "mob";
+        }
+        return where;
     }
 }

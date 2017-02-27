@@ -38,11 +38,13 @@ public class DnDModel {
     }
 
     //BUTTONS------------------------------------------------------------------
-    public void enter(String name, int health) {
-        if (health == 0) {
+    public void enter(String name, int health, String type) {
+        if (type.equals("player")) {
             this.addToOrder(name);
-        } else {
+        } else if (type.equals("mob")) {
             this.addToOrder(name, health);
+        } else if (type.equals("npc")) {
+            this.addToOrder(name, health, type);
         }
         //        for (DChar ch : this.lOrd) {
         //            System.out.println(ch.toString());
@@ -96,7 +98,7 @@ public class DnDModel {
     }
 
     public void addMob(String name, int health) {
-        this.lMob.add(new DChar(name, health));
+        this.addToOrder(name, health);
     }
 
     public void removeMob(int pos) {
@@ -196,6 +198,19 @@ public class DnDModel {
             this.lOrd.get(0).changeTop();
         }
         //System.out.println("Added Player: " + name);
+    }
+
+    /**
+     * Add npc
+     */
+    private void addToOrder(String name, int health, String type) {
+        DChar npc = new DChar(name, health, type);
+        this.lMob.add(npc);
+        this.lOrd.add(npc);
+        if (this.lOrd.size() == 1) {
+            this.lOrd.get(0).changeTop();
+        }
+        //System.out.println("Added NPC: " + name);
     }
 
     /**

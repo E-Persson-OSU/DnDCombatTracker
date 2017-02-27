@@ -32,25 +32,34 @@ public class DChar {
         this.health = health;
     }
 
-    @Override
-    public String toString() {
+    public DChar(String name, int health, String type) {
+        this.name = name;
+        this.top = false;
+        this.statusConditions = new HashMap<String, Integer>();
+        this.player = true;
+        this.health = health;
+    }
+
+    public String toStringMobMenu() {
         String name = this.name;
-        if (!this.player) {
-            if (this.health <= 0) {
-                name = name + ", *DEAD*";
-            } else {
-                name = name + ", " + this.health;
-            }
+        if (this.health <= 0) {
+            name = name + ", *DEAD*";
+        } else {
+            name = name + ", " + this.health;
         }
         return name;
     }
 
-    public String toString2() {
+    public String toStringOrder() {
         String name = this.name;
         if (this.top) {
             name += "*TOP*";
         }
         return name;
+    }
+
+    public String toStringHolds() {
+        return this.name;
     }
 
     public boolean top() {
