@@ -5,7 +5,7 @@ import java.util.Map;
  * Class made to contain character information for DnDCombatTracker.
  *
  * @author E-Persson-OSU
- * @version 0.22
+ * @version 0.23
  *
  */
 public class DChar {
