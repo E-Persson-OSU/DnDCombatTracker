@@ -1,0 +1,22 @@
+To do list:
+View---------------------------------------------------------------------------
+Add ActionListeners to all the buttons
+
+Controller---------------------------------------------------------------------
+Add button processing methods for all buttons
+
+Model--------------------------------------------------------------------------
+Add button methods for all buttons
+
+
+Buttons:
+bEnter
+bUndo
+bFinish
+bNextPlayer
+bHoldTurn
+bInsertTurn
+bDamage
+bHeal
+bAddMob
+bRemoveMob
