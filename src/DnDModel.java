@@ -1,9 +1,5 @@
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.List;
 
 /**
  * The model. This stores the data for the program.
@@ -12,11 +8,12 @@ import java.util.Set;
  *
  */
 public class DnDModel {
+
     /**
      * Stores the initiative orders and queue for holding turns
      */
-    private Queue<String> initOrd, mobs;
-    private Set<String> holds, dead;
+    //private Queue<String> initOrd, mobs;
+    private List<DChar> lOrd, lMob, lDead, lHold;
 
     /**
      * Turn number
@@ -24,36 +21,31 @@ public class DnDModel {
     private int turns;
 
     /**
-     * Top of the round name.
+     * Tells whether enemies have been inserted.
      */
-    private String topOfTheRound;
-
-    /**
-     * Map to hold additional info, such as health.
-     */
-    private Map<String, Integer> healthMap;
+    private boolean enemyIn;
 
     /**
      * Public constructor.
      */
     public DnDModel() {
-        this.initOrd = new LinkedList<>();
-        this.holds = new HashSet<>();
-        this.dead = new HashSet<>();
-        this.mobs = new LinkedList<>();
+        this.lOrd = new LinkedList<>();
+        this.lMob = new LinkedList<>();
+        this.lDead = new LinkedList<>();
+        this.lHold = new LinkedList<>();
         this.turns = 1;
-        this.healthMap = new HashMap<>();
-        this.topOfTheRound = "";
+        this.enemyIn = false;
     }
 
-    /*
-     * Buttons
-     */
+    //BUTTONS------------------------------------------------------------------
     public void enter(String name, int health) {
         if (health == 0) {
             this.addToOrder(name);
         } else {
             this.addToOrder(name, health);
+        }
+        for (DChar ch : this.lOrd) {
+            System.out.println(ch.toString());
         }
     }
 
@@ -62,82 +54,41 @@ public class DnDModel {
         return name;
     }
 
-    public Queue<String> finish() {
-        return this.initOrd;
+    public List<DChar> finish() {
+        for (DChar ch : this.lOrd) {
+            System.out.println(ch.toString());
+        }
+        return this.lOrd;
     }
 
-    public int lengthOfInitOrd() {
-        return this.initOrd.size();
+    public void damage(int dmg, int pos) {
+        dmg = dmg * -1;
+        this.lMob.get(pos).changeHealth(dmg);
     }
 
-    public Queue<String> nextPlayer() {
-        this.initOrd.add(this.initOrd.remove());
-        if (this.initOrd.peek().equals(this.topOfTheRound)) {
+    public void heal(int dmg, int pos) {
+        this.lMob.get(pos).changeHealth(dmg);
+    }
+
+    public void holdTurn(int pos) {
+        this.moveToHold(pos);
+    }
+
+    public void insertTurn(int pos) {
+        this.moveToInitOrd(pos);
+    }
+
+    public List<DChar> nextPlayer() {
+        this.lOrd.add(this.lOrd.remove(0));
+        if (this.lOrd.get(0).top()) {
             this.incrementTurns();
         }
-        return this.initOrd;
+        return this.lOrd;
     }
 
-    /**
-     * Methods for setting up initiative order.
-     */
-    /*
-     * Add mob
-     */
-    private void addToOrder(String name, int health) {
-        this.healthMap.put(name, health);
-        this.mobs.add(name);
-        if (this.topOfTheRound.length() == 0) {
-            this.topOfTheRound = name;
-        }
-        if (!this.initOrd.contains("HOSTILES")) {
-            this.initOrd.add("HOSTILES");
-        }
-        //Test statement
-        //        System.out.println("Mob: " + name + ", Health: " + health
-        //                + " added successfully!");
-        //        System.out.println("Queue contains: ");
-        //        for (String str : this.initOrd) {
-        //            System.out.println(str);
-        //        }
-
-    }
-
-    /*
-     * Add player
-     */
-    private void addToOrder(String name) {
-        this.initOrd.add(name);
-        if (this.topOfTheRound.length() == 0) {
-            this.topOfTheRound = name;
-        }
-        //        System.out.println("Player: " + name + " added successfully!");
-        //        System.out.println("Queue contains: ");
-        //        for (String str : this.initOrd) {
-        //            System.out.println(str);
-        //        }
-    }
-
-    private String removeLastNameAdded() {
-        for (int i = 0; i < this.initOrd.size() - 1; i++) {
-            this.initOrd.add(this.initOrd.remove());
-        }
-        String last = this.initOrd.remove();
-        if (this.healthMap.containsKey(last)) {
-            this.healthMap.remove(last);
-        }
-        return last;
-    }
-
-    /**
-     * Moves name from front of initiative order to Hold set.
-     */
-    public void moveToHold() {
-        String name = this.initOrd.remove();
-        if (name.equals(this.topOfTheRound)) {
-            this.topOfTheRound = this.initOrd.peek();
-        }
-        this.holds.add(name);
+    //OTHER--------------------------------------------------------------------
+    public int lengthOfInitOrd() {
+        return this.lOrd.size();
     }
 
     /**
@@ -154,52 +105,14 @@ public class DnDModel {
     }
 
     public boolean topOfTheRound() {
-        return this.initOrd.peek().equals(this.topOfTheRound);
+        return this.lOrd.get(0).top();
     }
 
-    public Map<String, Integer> getMobMap() {
-        return this.healthMap;
-    }
-
-    public Queue<String> getMobs() {
-        Queue<String> temp = new LinkedList<>();
-        temp.addAll(this.mobs);
-        return temp;
-    }
-
-    /**
-     * Changes health of a mob.
-     *
-     * @param heal
-     *            if heal = true, heal; else damage
-     * @param health
-     *            amount of damage to deal.
-     */
-    public void changeHealth(boolean heal, int health, String name) {
-        if (heal) {
-            int currentHealth = this.healthMap.get(name);
-            currentHealth += health;
-            this.healthMap.put(name, currentHealth);
-        } else {
-            int currentHealth = this.healthMap.get(name);
-            currentHealth -= health;
-            if (currentHealth <= 0) {
-                this.healthMap.remove(name);
-                this.dead.add(name);
-                name = "*DEAD* " + name;
-                this.healthMap.put(name, 0);
-
-            } else {
-                this.healthMap.put(name, currentHealth);
-            }
+    public List<DChar> getMobList() {
+        for (DChar ch : this.lMob) {
+            System.out.println(ch.toString());
         }
-    }
-
-    public void holdTurn() {
-        String name = this.initOrd.remove();
-        if (name.equals(this.topOfTheRound)) {
-            this.topOfTheRound = this.initOrd.peek();
-        }
+        return this.lMob;
     }
 
     /**
@@ -208,9 +121,6 @@ public class DnDModel {
      * @param name
      *            adds
      */
-    public void insertTurn(String name) {
-        moveToInitOrd(name, this.holds, this.initOrd);
-    }
 
     //Private helper methods
     /**
@@ -219,13 +129,57 @@ public class DnDModel {
      * @param name
      *            the name to add to {@code initOrd}
      */
-    private static void moveToInitOrd(String name, Set<String> holds,
-            Queue<String> initOrd) {
-        if (holds.remove(name)) {
-            initOrd.add(name);
-            while (initOrd.peek().equals(name)) {
-                initOrd.add(initOrd.remove());
-            }
+    private void moveToInitOrd(int pos) {
+        this.lOrd.add(0, this.lHold.remove(pos));
+    }
+
+    /**
+     * Add mob
+     */
+    private void addToOrder(String name, int health) {
+        this.lMob.add(new DChar(name, health));
+        if (!this.enemyIn) {
+            this.lOrd.add(new DChar("ENEMIES"));
+            this.enemyIn = true;
         }
+        if (this.lOrd.size() == 0) {
+            this.lOrd.get(0).changeTop();
+        }
+        System.out.println("Added Mob: " + name);
+    }
+
+    /**
+     * Add player
+     */
+    private void addToOrder(String name) {
+        this.lOrd.add(new DChar(name));
+        if (this.lOrd.size() == 0) {
+            this.lOrd.get(0).changeTop();
+        }
+        System.out.println("Added Player: " + name);
+    }
+
+    /**
+     * Undo helper
+     */
+    private String removeLastNameAdded() {
+        String name = this.lOrd.remove(this.lOrd.size() - 1).toString();
+        if (name.equals("ENEMIES")) {
+            this.lMob = new LinkedList<>();
+            this.enemyIn = false;
+        }
+        return name;
+    }
+
+    /**
+     * Moves name from front of initiative order to Hold set.
+     */
+    private void moveToHold(int pos) {
+        DChar toHold = this.lOrd.remove(pos);
+        if (toHold.top()) {
+            toHold.changeTop();
+            this.lOrd.get(0).changeTop();
+        }
+        this.lHold.add(toHold);
     }
 }
