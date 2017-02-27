@@ -40,6 +40,11 @@ public class DChar {
         this.health = health;
     }
 
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
     public String toStringMobMenu() {
         String name = this.name;
         if (this.health <= 0) {

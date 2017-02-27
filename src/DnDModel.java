@@ -26,6 +26,11 @@ public class DnDModel {
     private boolean enemyIn;
 
     /**
+     * Enemy DCHar
+     */
+    private DChar enemies;
+
+    /**
      * Public constructor.
      */
     public DnDModel() {
@@ -35,6 +40,7 @@ public class DnDModel {
         this.lHold = new LinkedList<>();
         this.turns = 1;
         this.enemyIn = false;
+        this.enemies = new DChar("ENEMIES");
     }
 
     //BUTTONS------------------------------------------------------------------
@@ -106,6 +112,11 @@ public class DnDModel {
             pos = 0;
         }
         this.lMob.remove(pos);
+        if (this.lMob.size() == 0) {
+            this.lMob = new LinkedList<>();
+            this.lOrd.remove(this.enemies);
+            this.enemyIn = false;
+        }
     }
 
     //OTHER--------------------------------------------------------------------
@@ -180,7 +191,7 @@ public class DnDModel {
     private void addToOrder(String name, int health) {
         this.lMob.add(new DChar(name, health));
         if (!this.enemyIn) {
-            this.lOrd.add(new DChar("ENEMIES"));
+            this.lOrd.add(this.enemies);
             this.enemyIn = true;
         }
         if (this.lOrd.size() == 1) {
@@ -217,12 +228,12 @@ public class DnDModel {
      * Undo helper
      */
     private String removeLastNameAdded() {
-        String name = this.lOrd.remove(this.lOrd.size() - 1).toString();
-        if (name.equals("ENEMIES")) {
+        DChar removed = this.lOrd.remove(this.lOrd.size() - 1);
+        if (removed.equals(this.enemies)) {
             this.lMob = new LinkedList<>();
             this.enemyIn = false;
         }
-        return name;
+        return this.enemies.toString();
     }
 
     /**

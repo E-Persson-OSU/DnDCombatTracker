@@ -168,12 +168,17 @@ public final class DnDView extends JFrame
         this.bHeal = new JButton("Heal");
         this.bRemoveMob = new JButton("Remove Mob");
 
+        //variables
+        this.enterPlayer = true;
+        this.view = true;
+
         //Set Properties-------------------------------------------------------
         /*
          * Buttons
          */
         this.bUndo.setEnabled(false);
         this.bFinish.setEnabled(false);
+        this.rbPlayer.setSelected(true);
         this.bHoldTurn.setFont(this.FONT_HEADER);
         this.bInsertTurn.setFont(this.FONT_HEADER);
         this.bNextPlayer.setFont(this.FONT_HEADER);
@@ -187,8 +192,10 @@ public final class DnDView extends JFrame
          */
         this.lTurnOrder.setBorder(this.BORDER);
         this.lTurnOrder.setFont(this.FONT_PLAIN);
+
         this.lHolds.setBorder(this.BORDER);
         this.lHolds.setFont(this.FONT_PLAIN);
+
         this.lMobMenu.setFont(this.FONT_PLAIN);
         this.lMobMenu.setBorder(this.BORDER);
         /*
@@ -196,16 +203,23 @@ public final class DnDView extends JFrame
          */
         this.tHealth.setColumns(this.TEXT_FIELD_WIDTH);
         this.tHealth.setFont(this.FONT_PLAIN);
+        this.tHealth.setEnabled(false);
+
         this.tNames.setColumns(this.TEXT_FIELD_WIDTH);
         this.tNames.setFont(this.FONT_PLAIN);
+
         this.tSpecName.setEditable(false);
         this.tSpecName.setFont(this.FONT_HEADER);
+
         this.tSpecHealth.setEditable(false);
         this.tSpecHealth.setFont(this.FONT_HEADER);
+
         this.tTurns.setEditable(false);
         this.tTurns.setFont(this.FONT_HEADER);
+
         this.tSpecHoldOrder.setFont(this.FONT_HEADER);
         this.tSpecHoldOrder.setEditable(false);
+
         this.tSpecTurnOrder.setEditable(false);
         this.tSpecTurnOrder.setFont(this.FONT_HEADER);
 
@@ -308,7 +322,6 @@ public final class DnDView extends JFrame
          * Set up JFrames
          */
         //Set up the enter window
-        this.view = true;
         this.ENTER_FRAME = new JFrame();
         this.ENTER_FRAME.setTitle("Enter Initiative Order");
         this.ENTER_FRAME.add(this.ENTER_PANEL);
@@ -316,9 +329,6 @@ public final class DnDView extends JFrame
         this.ENTER_FRAME.pack();
         this.ENTER_FRAME.setSize(this.ENTER_INIT_WIDTH, this.ENTER_INIT_HEIGHT);
         this.ENTER_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.rbPlayer.setSelected(true);
-        this.enterPlayer = true;
-        this.tHealth.setEnabled(false);
         this.ENTER_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
                 this.dim / 2 - this.getSize().height / 2);
         this.ENTER_FRAME.setVisible(true);
@@ -566,6 +576,7 @@ public final class DnDView extends JFrame
         this.bDamage.setEnabled(lMobsSize > 0);
         this.bHeal.setEnabled(lMobsSize > 0);
         this.bNextPlayer.setEnabled(lOrdSize > 0);
+        this.bRemoveMob.setEnabled(lMobsSize > 0);
     }
 
     /**
