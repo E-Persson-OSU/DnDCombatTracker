@@ -6,9 +6,10 @@ import java.awt.GridLayout;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.NumberFormat;
-import java.util.Map;
-import java.util.Queue;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,13 +28,14 @@ import javax.swing.border.Border;
  * @author E-Persson-OSU
  *
  */
-public final class DnDView extends JFrame implements ActionListener {
+public final class DnDView extends JFrame
+        implements ActionListener, MouseListener {
 
     /**
      * JFrame
      */
     private final JFrame ENTER_FRAME;
-    private final JFrame MAIN_FRAME;
+    private JFrame MAIN_FRAME;
 
     /**
      * JPanels
@@ -290,17 +292,10 @@ public final class DnDView extends JFrame implements ActionListener {
         this.ENTER_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.ENTER_FRAME.setVisible(true);
         //Set up main window
-        this.MAIN_FRAME = new JFrame();
-        this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
-        this.MAIN_FRAME.add(this.MAIN_PANEL);
-        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
-        this.MAIN_FRAME.pack();
-        this.MAIN_FRAME.setSize(768, 1024);
-        this.MAIN_FRAME.setResizable(false);
-        this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.MAIN_FRAME.setVisible(false);
 
     }
+
+    //ACTION PROCESSING--------------------------------------------------------
 
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -315,17 +310,98 @@ public final class DnDView extends JFrame implements ActionListener {
         if (source.equals(this.bEnter.getActionCommand())) {
             this.controller.processEnterEvent();
         } else if (source.equals(this.bFinish.getActionCommand())) {
-            this.view = false;
-            this.ENTER_FRAME.dispose();
-            this.MAIN_FRAME.setVisible(true);
             this.controller.processFinishEvent();
         } else if (source.equals(this.bUndo.getActionCommand())) {
             this.controller.processUndoEvent();
         } else if (source.equals(this.bNextPlayer.getActionCommand())) {
             this.controller.processNextPlayerEvent();
+        } else if (source.equals(this.bHoldTurn.getActionCommand())) {
+            this.controller.processHoldTurnEvent();
+        } else if (source.equals(this.bInsertTurn.getActionCommand())) {
+            this.controller.processInsertTurnEvent();
+        } else if (source.equals(this.bDamage.getActionCommand())) {
+            this.controller.processDamageEvent();
+        } else if (source.equals(this.bHeal.getActionCommand())) {
+            this.controller.processHealEvent();
+        } else if (source.equals(this.bAddMob.getActionCommand())) {
+            this.controller.processAddMobEvent();
+        } else if (source.equals(this.bRemoveMob.getActionCommand())) {
+            this.controller.processRemoveMobEvent();
         }
         //Action done being processed
         this.setCursor(Cursor.getDefaultCursor());
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent event) {
+        String location = event.getSource().toString();
+        if (location.equals(this.lHolds.toString())) {
+            if (event.getClickCount() == 2) {
+                System.out.println("Registered Double Click: Holds");
+                int index = this.lHolds.locationToIndex(event.getPoint());
+                this.controller.processDoubleClickHolds(index);
+            }
+        } else if (location.equals(this.lTurnOrder.toString())) {
+            if (event.getClickCount() == 2) {
+                System.out.println("Registered Double Click: Order");
+                int index = this.lTurnOrder.locationToIndex(event.getPoint());
+                this.controller.processDoubleClickTurnOrder(index);
+            }
+        } else if (location.equals(this.lMobMenu.toString())) {
+            if (event.getClickCount() == 2) {
+                System.out.println("Registered Double Click: Mob Menu");
+                int index = this.lMobMenu.locationToIndex(event.getPoint());
+                this.controller.processDoubleClickMobMenu(index);
+            }
+        }
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    //EVENT METHOD HELPERS-----------------------------------------------------
+    public void finish() {
+        this.view = false;
+        this.MAIN_FRAME = new JFrame();
+        this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
+        this.MAIN_FRAME.add(this.MAIN_PANEL);
+        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
+        this.MAIN_FRAME.pack();
+        this.MAIN_FRAME.setSize(768, 1024);
+        this.MAIN_FRAME.setResizable(true);
+        this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.ENTER_FRAME.dispose();
+        this.MAIN_FRAME.setVisible(true);
+    }
+
+    public String getTurnOrderSelected() {
+        return this.lTurnOrder.getSelectedValue();
+    }
+
+    public String getHoldSelected() {
+        return this.lHolds.getSelectedValue();
     }
 
     /**
@@ -345,6 +421,11 @@ public final class DnDView extends JFrame implements ActionListener {
         this.bInsertTurn.addActionListener(this);
     }
 
+    /**
+     * Register controller.
+     *
+     * @param controller
+     */
     public void registerObserver(DnDController controller) {
         this.controller = controller;
     }
@@ -360,21 +441,18 @@ public final class DnDView extends JFrame implements ActionListener {
 
     public int getHealth() {
         String health = this.tHealth.getText();
-        int healthInt;
         if (health.length() == 0) {
-            healthInt = 0;
+            return 0;
         } else {
-            healthInt = Integer.parseInt(health);
+            return Integer.parseInt(this.tHealth.getText());
         }
-        System.out.println("Added: " + healthInt + " health.");
-        return healthInt;
     }
 
     /**
      * Clears fields
      */
     public void clear() {
-        this.tHealth.setText("");
+        this.tHealth.setValue(null);
         this.tNames.setText("");
     }
 
@@ -404,12 +482,14 @@ public final class DnDView extends JFrame implements ActionListener {
     /**
      * Set initiative order text area text.
      */
-    public void setInitOrdText(Queue<String> q) {
-        String[] initOrd = new String[q.size()];
-        for (int pos = 0; pos < initOrd.length; pos++) {
-            initOrd[pos] = q.remove();
+    public void setInitOrdText(List<DChar> lOrd) {
+        String[] arr = new String[lOrd.size()];
+        int pos = 0;
+        for (DChar ch : lOrd) {
+            arr[pos] = ch.toString2();
+            pos++;
         }
-        this.lTurnOrder.setListData(initOrd);
+        this.lTurnOrder.setListData(arr);
     }
 
     /**
@@ -422,15 +502,14 @@ public final class DnDView extends JFrame implements ActionListener {
     /**
      * Set Mob Menu
      */
-    public void updateMobMenu(Map<String, Integer> mobMap, Queue<String> q) {
-        String[] mobs = new String[mobMap.size()];
+    public void updateMobMenu(List<DChar> lMob) {
+        String[] arr = new String[lMob.size()];
         int pos = 0;
-        for (String name : q) {
-            if (mobMap.containsKey(name)) {
-                mobs[pos] = name + ", " + mobMap.get(name);
-            }
+        for (DChar ch : lMob) {
+            arr[pos] = ch.toString();
             pos++;
         }
-        this.lMobMenu.setListData(mobs);
+        this.lMobMenu.setListData(arr);
     }
+
 }
