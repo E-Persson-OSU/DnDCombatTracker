@@ -91,12 +91,14 @@ public class DnDController {
     }
 
     public void processDamageEvent() {
-        this.model.damage(this.view.healthDialog(), this.view.getMobSelected());
+        this.model.damage(this.view.healthDialog(true),
+                this.view.getMobSelected());
         this.updateViewToMatchModel(this.model, this.view);
     }
 
     public void processHealEvent() {
-        this.model.heal(this.view.healthDialog(), this.view.getMobSelected());
+        this.model.heal(this.view.healthDialog(false),
+                this.view.getMobSelected());
         this.updateViewToMatchModel(this.model, this.view);
     }
 
@@ -121,7 +123,14 @@ public class DnDController {
     }
 
     public void processDoubleClickMobMenu(int pos) {
-        this.model.damage(this.view.healthDialog(), this.view.getMobSelected());
+        this.model.damage(this.view.healthDialog(true),
+                this.view.getMobSelected());
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processTripleClickMobMenu(int pos) {
+        this.model.heal(this.view.healthDialog(false),
+                this.view.getMobSelected());
         this.updateViewToMatchModel(this.model, this.view);
     }
 }

@@ -424,11 +424,15 @@ public final class DnDView extends JFrame
                 this.controller.processDoubleClickTurnOrder(index);
             }
         } else if (location.equals(this.lMobMenu.toString())) {
-            if (event.getClickCount() == 2) {
+            if (event.getClickCount() == 3) {
+                int index = this.lMobMenu.locationToIndex(event.getPoint());
+                this.controller.processTripleClickMobMenu(index);
+            } else if (event.getClickCount() == 2) {
                 //System.out.println("Registered Double Click: Mob Menu");
                 int index = this.lMobMenu.locationToIndex(event.getPoint());
                 this.controller.processDoubleClickMobMenu(index);
             }
+
         }
 
     }
@@ -632,9 +636,15 @@ public final class DnDView extends JFrame
         this.lHolds.setListData(arr);
     }
 
-    public int healthDialog() {
-        int amount = Integer.parseInt(
-                JOptionPane.showInputDialog(this.MAIN_FRAME, "Enter Amount:"));
+    public int healthDialog(boolean damage) {
+        String title = "THIS SHOULDN'T APPEAR!!!";
+        if (damage) {
+            title = "Damage";
+        } else {
+            title = "Heal";
+        }
+        int amount = Integer.parseInt(JOptionPane
+                .showInputDialog(this.MAIN_FRAME, "Enter Amount:", title));
         return amount;
     }
 

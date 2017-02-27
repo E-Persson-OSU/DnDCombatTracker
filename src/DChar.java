@@ -65,7 +65,7 @@ public class DChar {
     public String toStringOrder() {
         String name = this.name;
         if (this.top) {
-            name += "*TOP*";
+            name += " *TOP*";
         }
         return name;
     }
