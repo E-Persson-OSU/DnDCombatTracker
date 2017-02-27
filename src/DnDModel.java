@@ -63,6 +63,9 @@ public class DnDModel {
 
     public void damage(int dmg, int pos) {
         dmg = dmg * -1;
+        if (pos < 0) {
+            pos = 0;
+        }
         this.lMob.get(pos).changeHealth(dmg);
     }
 
@@ -71,6 +74,9 @@ public class DnDModel {
     }
 
     public void holdTurn(int pos) {
+        if (pos < 0) {
+            pos = 0;
+        }
         this.moveToHold(pos);
     }
 
@@ -91,6 +97,14 @@ public class DnDModel {
         return this.lOrd.size();
     }
 
+    public int lengthOfHoldOrd() {
+        return this.lHold.size();
+    }
+
+    public int lengthOfMobOrd() {
+        return this.lMob.size();
+    }
+
     /**
      * Running the game
      *
@@ -109,10 +123,11 @@ public class DnDModel {
     }
 
     public List<DChar> getMobList() {
-        for (DChar ch : this.lMob) {
-            System.out.println(ch.toString());
-        }
         return this.lMob;
+    }
+
+    public List<DChar> getHoldList() {
+        return this.lHold;
     }
 
     /**
@@ -130,7 +145,13 @@ public class DnDModel {
      *            the name to add to {@code initOrd}
      */
     private void moveToInitOrd(int pos) {
+        if (pos < 0) {
+            pos = 0;
+        }
         this.lOrd.add(0, this.lHold.remove(pos));
+        if (this.lOrd.size() == 1) {
+            this.lOrd.get(0).changeTop();
+        }
     }
 
     /**
@@ -154,7 +175,7 @@ public class DnDModel {
     private void addToOrder(String name) {
         this.lOrd.add(new DChar(name));
         if (this.lOrd.size() == 1) {
-           this.lOrd.get(0).changeTop();
+            this.lOrd.get(0).changeTop();
         }
         System.out.println("Added Player: " + name);
     }
@@ -178,7 +199,9 @@ public class DnDModel {
         DChar toHold = this.lOrd.remove(pos);
         if (toHold.top()) {
             toHold.changeTop();
-            this.lOrd.get(0).changeTop();
+            if (this.lOrd.size() > 0) {
+                this.lOrd.get(0).changeTop();
+            }
         }
         this.lHold.add(toHold);
     }

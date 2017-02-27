@@ -18,7 +18,6 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -63,7 +62,7 @@ public final class DnDView extends JFrame
     /**
      * Text area for displaying turn order
      */
-    private final JTextArea taTurnOrder;
+    //private final JTextArea taHolding;
 
     /**
      * Lets try a list
@@ -121,21 +120,21 @@ public final class DnDView extends JFrame
         this.tSpecHealth = new JTextField("Health: ");
         this.healthFormat = NumberFormat.getIntegerInstance();
         this.tHealth = new JFormattedTextField(this.healthFormat);
-        this.tSpecHoldOrder = new JTextField("Holds: ");
+        this.tSpecHoldOrder = new JTextField("Add or Hold: ");
         this.tTurns = new JTextField("Turn: 1");
         this.tSpecTurnOrder = new JTextField("Initiative Order: ");
 
         /*
          * Text areas
          */
-        this.taTurnOrder = new JTextArea(20, 20);
-        this.lHolds = new JList<String>();
-        this.lMobMenu = new JList<String>();
+        //this.taHolding = new JTextArea();
 
         /*
          * List
          */
         this.lTurnOrder = new JList<String>();
+        this.lHolds = new JList<String>();
+        this.lMobMenu = new JList<String>();
 
         /*
          * Buttons
@@ -307,6 +306,7 @@ public final class DnDView extends JFrame
          * Process action.
          */
         String source = event.getActionCommand();
+        System.out.println(source);
         if (source.equals(this.bEnter.getActionCommand())) {
             this.controller.processEnterEvent();
         } else if (source.equals(this.bFinish.getActionCommand())) {
@@ -316,9 +316,11 @@ public final class DnDView extends JFrame
         } else if (source.equals(this.bNextPlayer.getActionCommand())) {
             this.controller.processNextPlayerEvent();
         } else if (source.equals(this.bHoldTurn.getActionCommand())) {
-            this.controller.processHoldTurnEvent();
+            this.controller
+                    .processHoldTurnEvent(this.lTurnOrder.getSelectedIndex());
         } else if (source.equals(this.bInsertTurn.getActionCommand())) {
-            this.controller.processInsertTurnEvent();
+            this.controller
+                    .processInsertTurnEvent(this.lHolds.getSelectedIndex());
         } else if (source.equals(this.bDamage.getActionCommand())) {
             this.controller.processDamageEvent();
         } else if (source.equals(this.bHeal.getActionCommand())) {
@@ -404,6 +406,10 @@ public final class DnDView extends JFrame
         return this.lHolds.getSelectedValue();
     }
 
+    public void setFocusToName() {
+        this.tNames.grabFocus();
+    }
+
     /**
      * Create buttons.
      */
@@ -417,7 +423,6 @@ public final class DnDView extends JFrame
         this.bRemoveMob.addActionListener(this);
         this.bDamage.addActionListener(this);
         this.bHeal.addActionListener(this);
-        this.bHoldTurn.addActionListener(this);
         this.bInsertTurn.addActionListener(this);
     }
 
@@ -467,9 +472,20 @@ public final class DnDView extends JFrame
     /**
      * Enable undo and finish if InitOrd > 0
      */
-    public void enableButtons(Boolean enable) {
+    public void enableEnterButtons(Boolean enable) {
         this.bUndo.setEnabled(enable);
         this.bFinish.setEnabled(enable);
+    }
+
+    /**
+     * Enable HoldTurn if lOrd.size() != 0 && !lOrd.get(0).player()
+     */
+    public void enableMainButtons(int lOrdSize, int lHoldsSize, int lMobsSize) {
+        this.bHoldTurn.setEnabled(lOrdSize > 0);
+        this.bInsertTurn.setEnabled(lHoldsSize > 0);
+        this.bDamage.setEnabled(lMobsSize > 0);
+        this.bHeal.setEnabled(lMobsSize > 0);
+        this.bNextPlayer.setEnabled(lOrdSize > 0);
     }
 
     /**
@@ -512,4 +528,26 @@ public final class DnDView extends JFrame
         this.lMobMenu.setListData(arr);
     }
 
+    /**
+     * Set hold order
+     */
+    public void updateHoldList(List<DChar> lHold) {
+        String[] arr = new String[lHold.size()];
+        int pos = 0;
+        for (DChar ch : lHold) {
+            arr[pos] = ch.toString();
+            pos++;
+        }
+        this.lHolds.setListData(arr);
+    }
+
+    public int healthDialog() {
+        int amount = Integer
+                .parseInt(JOptionPane.showInputDialog(this, "Enter Amount:"));
+        return amount;
+    }
+
+    public int getMobSelected() {
+        return this.lMobMenu.getSelectedIndex();
+    }
 }

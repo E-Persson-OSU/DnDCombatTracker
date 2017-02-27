@@ -10,7 +10,7 @@ public class DChar {
     /**
      * player = true, mob = false
      */
-    private boolean playerOrMob;
+    private boolean player;
 
     private Map<String, Integer> statusConditions;
 
@@ -20,7 +20,7 @@ public class DChar {
         this.name = name;
         this.top = false;
         this.statusConditions = new HashMap<String, Integer>();
-        this.playerOrMob = true;
+        this.player = true;
         this.health = 0;
     }
 
@@ -28,15 +28,15 @@ public class DChar {
         this.name = name;
         this.top = false;
         this.statusConditions = new HashMap<String, Integer>();
-        this.playerOrMob = false;
+        this.player = false;
         this.health = health;
     }
 
     @Override
     public String toString() {
         String name = this.name;
-        if (!this.playerOrMob) {
-           name = name + ", " + this.health;
+        if (!this.player) {
+            name = name + ", " + this.health;
         }
         return name;
     }
@@ -61,8 +61,8 @@ public class DChar {
         return this.statusConditions;
     }
 
-    public boolean playerOrMob() {
-        return this.playerOrMob;
+    public boolean player() {
+        return this.player;
     }
 
     public int health() {

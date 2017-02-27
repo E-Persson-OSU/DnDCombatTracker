@@ -40,12 +40,15 @@ public class DnDController {
     private void updateViewToMatchModel(DnDModel model, DnDView view) {
         if (this.view.getView()) {
             view.clear();
-            view.enableButtons(model.lengthOfInitOrd() > 0);
+            view.enableEnterButtons(model.lengthOfInitOrd() > 0);
             System.out.println("Updated Enter View.");
         } else {
             view.updateMobMenu(model.getMobList());
             view.setInitOrdText(model.finish());
+            view.updateHoldList(model.getHoldList());
             view.setTurn(model.turn());
+            view.enableMainButtons(model.lengthOfInitOrd(),
+                    model.lengthOfHoldOrd(), model.lengthOfMobOrd());
             System.out.println("Updated Main View.");
 
         }
@@ -58,6 +61,7 @@ public class DnDController {
         String name = this.view.getNameFromField();
         int health = this.view.getHealth();
         this.model.enter(name, health);
+        this.view.setFocusToName();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
@@ -77,18 +81,18 @@ public class DnDController {
         this.updateViewToMatchModel(this.model, this.view);
     }
 
-    public void processHoldTurnEvent() {
-        this.model.nextPlayer();
+    public void processHoldTurnEvent(int pos) {
+        this.model.holdTurn(pos);
         this.updateViewToMatchModel(this.model, this.view);
     }
 
-    public void processInsertTurnEvent() {
-        this.model.nextPlayer();
+    public void processInsertTurnEvent(int pos) {
+        this.model.insertTurn(pos);
         this.updateViewToMatchModel(this.model, this.view);
     }
 
     public void processDamageEvent() {
-        this.model.nextPlayer();
+        this.model.damage(this.view.healthDialog(), this.view.getMobSelected());
         this.updateViewToMatchModel(this.model, this.view);
     }
 
