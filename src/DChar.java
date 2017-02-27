@@ -34,7 +34,11 @@ public class DChar {
 
     @Override
     public String toString() {
-        return this.name;
+        String name = this.name;
+        if (!this.playerOrMob) {
+           name = name + ", " + this.health;
+        }
+        return name;
     }
 
     public String toString2() {
