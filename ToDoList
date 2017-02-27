@@ -1,6 +1,6 @@
 To do list:
 View---------------------------------------------------------------------------
-Add ActionListeners to all the buttons
+Find way to know which item on the list is being selected
 
 Controller---------------------------------------------------------------------
 Add button processing methods for all buttons
