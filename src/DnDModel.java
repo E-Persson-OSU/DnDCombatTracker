@@ -15,7 +15,7 @@ public class DnDModel {
     /**
      * Stores the initiative orders and queue for holding turns
      */
-    private Queue<String> initOrd;
+    private Queue<String> initOrd, mobs;
     private Set<String> holds, dead;
 
     /**
@@ -40,6 +40,7 @@ public class DnDModel {
         this.initOrd = new LinkedList<>();
         this.holds = new HashSet<>();
         this.dead = new HashSet<>();
+        this.mobs = new LinkedList<>();
         this.turns = 1;
         this.healthMap = new HashMap<>();
         this.topOfTheRound = "";
@@ -61,8 +62,20 @@ public class DnDModel {
         return name;
     }
 
+    public Queue<String> finish() {
+        return this.initOrd;
+    }
+
     public int lengthOfInitOrd() {
         return this.initOrd.size();
+    }
+
+    public Queue<String> nextPlayer() {
+        this.initOrd.add(this.initOrd.remove());
+        if (this.initOrd.peek().equals(this.topOfTheRound)) {
+            this.incrementTurns();
+        }
+        return this.initOrd;
     }
 
     /**
@@ -73,15 +86,21 @@ public class DnDModel {
      */
     private void addToOrder(String name, int health) {
         this.healthMap.put(name, health);
+        this.mobs.add(name);
         if (this.topOfTheRound.length() == 0) {
             this.topOfTheRound = name;
         }
-        if (!this.initOrd.contains("Mobs")) {
-            this.initOrd.add("Mobs");
+        if (!this.initOrd.contains("HOSTILES")) {
+            this.initOrd.add("HOSTILES");
         }
         //Test statement
-        System.out.println("Mob: " + name + ", Health: " + health
-                + " added successfully!");
+        //        System.out.println("Mob: " + name + ", Health: " + health
+        //                + " added successfully!");
+        //        System.out.println("Queue contains: ");
+        //        for (String str : this.initOrd) {
+        //            System.out.println(str);
+        //        }
+
     }
 
     /*
@@ -92,7 +111,11 @@ public class DnDModel {
         if (this.topOfTheRound.length() == 0) {
             this.topOfTheRound = name;
         }
-        System.out.println("Player: " + name + " added successfully!");
+        //        System.out.println("Player: " + name + " added successfully!");
+        //        System.out.println("Queue contains: ");
+        //        for (String str : this.initOrd) {
+        //            System.out.println(str);
+        //        }
     }
 
     private String removeLastNameAdded() {
@@ -132,6 +155,16 @@ public class DnDModel {
 
     public boolean topOfTheRound() {
         return this.initOrd.peek().equals(this.topOfTheRound);
+    }
+
+    public Map<String, Integer> getMobMap() {
+        return this.healthMap;
+    }
+
+    public Queue<String> getMobs() {
+        Queue<String> temp = new LinkedList<>();
+        temp.addAll(this.mobs);
+        return temp;
     }
 
     /**

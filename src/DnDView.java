@@ -3,14 +3,18 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.Map;
+import java.util.Queue;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -50,9 +54,19 @@ public final class DnDView extends JFrame implements ActionListener {
     private final JFormattedTextField tHealth;
 
     /**
+     * Scroll Panes
+     */
+    private final ScrollPane spMobMenu;
+
+    /**
      * Text area for displaying turn order
      */
-    private final JTextArea taTurnOrder, taHolds, taMobMenu;
+    private final JTextArea taTurnOrder;
+
+    /**
+     * Lets try a list
+     */
+    private final JList<String> lHolds, lTurnOrder, lMobMenu;
 
     /**
      * Buttons
@@ -85,6 +99,11 @@ public final class DnDView extends JFrame implements ActionListener {
     private DnDController controller;
 
     /**
+     * Current view: true = enter, false = main.
+     */
+    private boolean view;
+
+    /**
      * No-argument constructor.
      */
     public DnDView() {
@@ -104,25 +123,17 @@ public final class DnDView extends JFrame implements ActionListener {
         this.tTurns = new JTextField("Turn: 1");
         this.tSpecTurnOrder = new JTextField("Initiative Order: ");
 
-        //Set properties
-        this.tHealth.setColumns(this.TEXT_FIELD_WIDTH);
-        this.tNames.setColumns(this.TEXT_FIELD_WIDTH);
-        this.tSpecName.setEditable(false);
-        this.tSpecHealth.setEditable(false);
-        this.tSpecName.setFont(this.FONT_HEADER);
-        this.tSpecHealth.setFont(this.FONT_HEADER);
-        this.tHealth.setFont(this.FONT_PLAIN);
-        this.tNames.setFont(this.FONT_PLAIN);
-        this.tTurns.setEditable(false);
-        this.tSpecHoldOrder.setEditable(false);
-        this.tSpecTurnOrder.setEditable(false);
-
         /*
          * Text areas
          */
         this.taTurnOrder = new JTextArea(20, 20);
-        this.taHolds = new JTextArea();
-        this.taMobMenu = new JTextArea();
+        this.lHolds = new JList<String>();
+        this.lMobMenu = new JList<String>();
+
+        /*
+         * List
+         */
+        this.lTurnOrder = new JList<String>();
 
         /*
          * Buttons
@@ -141,13 +152,46 @@ public final class DnDView extends JFrame implements ActionListener {
         this.bHeal = new JButton("Heal");
         this.bRemoveMob = new JButton("Remove Mob");
 
-        //set properties
+        //Set Properties-------------------------------------------------------
+        /*
+         * Buttons
+         */
         this.bUndo.setEnabled(false);
         this.bFinish.setEnabled(false);
-        this.taTurnOrder.setEditable(false);
-        this.taHolds.setEditable(false);
-        this.taMobMenu.setEditable(false);
-        this.taTurnOrder.setBorder(this.BORDER);
+        this.bHoldTurn.setFont(this.FONT_HEADER);
+        this.bInsertTurn.setFont(this.FONT_HEADER);
+        this.bNextPlayer.setFont(this.FONT_HEADER);
+        this.bAddMob.setFont(this.FONT_HEADER);
+        this.bRemoveMob.setFont(this.FONT_HEADER);
+        this.bDamage.setFont(this.FONT_HEADER);
+        this.bHeal.setFont(this.FONT_HEADER);
+
+        /*
+         * Text Areas
+         */
+        this.lTurnOrder.setBorder(this.BORDER);
+        this.lTurnOrder.setFont(this.FONT_PLAIN);
+        this.lHolds.setBorder(this.BORDER);
+        this.lHolds.setFont(this.FONT_PLAIN);
+        this.lMobMenu.setFont(this.FONT_PLAIN);
+        this.lMobMenu.setBorder(this.BORDER);
+        /*
+         * Text Fields
+         */
+        this.tHealth.setColumns(this.TEXT_FIELD_WIDTH);
+        this.tHealth.setFont(this.FONT_PLAIN);
+        this.tNames.setColumns(this.TEXT_FIELD_WIDTH);
+        this.tNames.setFont(this.FONT_PLAIN);
+        this.tSpecName.setEditable(false);
+        this.tSpecName.setFont(this.FONT_HEADER);
+        this.tSpecHealth.setEditable(false);
+        this.tSpecHealth.setFont(this.FONT_HEADER);
+        this.tTurns.setEditable(false);
+        this.tTurns.setFont(this.FONT_HEADER);
+        this.tSpecHoldOrder.setFont(this.FONT_HEADER);
+        this.tSpecHoldOrder.setEditable(false);
+        this.tSpecTurnOrder.setEditable(false);
+        this.tSpecTurnOrder.setFont(this.FONT_HEADER);
 
         //Add ActionListener
         this.addActionListenerToButtons();
@@ -163,6 +207,7 @@ public final class DnDView extends JFrame implements ActionListener {
          * Main window
          */
         this.MAIN_PANEL = new JPanel(new GridLayout(1, 2));
+        this.spMobMenu = new ScrollPane();
 
         /*
          * Panels for enter window
@@ -173,9 +218,9 @@ public final class DnDView extends JFrame implements ActionListener {
         /*
          * Panels for main window
          */
-        this.MAIN_LEFT_PANEL = new JPanel(new GridLayout(3, 1));
+        this.MAIN_LEFT_PANEL = new JPanel(new BorderLayout());
         this.MAIN_RIGHT_PANEL = new JPanel(new GridLayout(3, 1));
-        this.MAIN_RIGHT_TOP = new JPanel(new GridLayout(3, 1));
+        this.MAIN_RIGHT_TOP = new JPanel(new BorderLayout());
         this.MAIN_RIGHT_TOP_BUTTONS = new JPanel(new GridLayout(1, 2));
         this.MAIN_RIGHT_MIDDLE = new JPanel(new GridLayout(2, 1));
         this.MAIN_RIGHT_MIDDLE_BUTTONS = new JPanel(new GridLayout(2, 2));
@@ -197,22 +242,24 @@ public final class DnDView extends JFrame implements ActionListener {
          * Add buttons and fields for main window
          */
         //left
-        this.MAIN_LEFT_PANEL.add(this.tSpecTurnOrder);
-        this.MAIN_LEFT_PANEL.add(this.taTurnOrder);
-        this.MAIN_LEFT_PANEL.add(this.tTurns);
+        this.MAIN_LEFT_PANEL.add(this.tSpecTurnOrder, BorderLayout.NORTH);
+        this.MAIN_LEFT_PANEL.add(this.lTurnOrder, BorderLayout.CENTER);
+        this.MAIN_LEFT_PANEL.add(this.tTurns, BorderLayout.SOUTH);
 
         //right top
         this.MAIN_RIGHT_TOP_BUTTONS.add(this.bHoldTurn);
         this.MAIN_RIGHT_TOP_BUTTONS.add(this.bInsertTurn);
-        this.MAIN_RIGHT_TOP.add(this.tSpecHoldOrder);
-        this.MAIN_RIGHT_TOP.add(this.taHolds);
-        this.MAIN_RIGHT_TOP.add(this.MAIN_RIGHT_TOP_BUTTONS);
+        this.MAIN_RIGHT_TOP.add(this.tSpecHoldOrder, BorderLayout.NORTH);
+        this.MAIN_RIGHT_TOP.add(this.lHolds, BorderLayout.CENTER);
+        this.MAIN_RIGHT_TOP.add(this.MAIN_RIGHT_TOP_BUTTONS,
+                BorderLayout.SOUTH);
         //right middle
         this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bAddMob);
         this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bRemoveMob);
         this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bDamage);
         this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bHeal);
-        this.MAIN_RIGHT_MIDDLE.add(this.taMobMenu);
+        this.spMobMenu.add(this.lMobMenu);
+        this.MAIN_RIGHT_MIDDLE.add(this.spMobMenu);
         this.MAIN_RIGHT_MIDDLE.add(this.MAIN_RIGHT_MIDDLE_BUTTONS);
         //right bottom
         this.MAIN_RIGHT_BOTTOM.add(this.bNextPlayer);
@@ -233,9 +280,11 @@ public final class DnDView extends JFrame implements ActionListener {
          * Set up JFrames
          */
         //Set up the enter window
+        this.view = true;
         this.ENTER_FRAME = new JFrame();
         this.ENTER_FRAME.setTitle("Enter Initiative Order");
         this.ENTER_FRAME.add(this.ENTER_PANEL);
+        this.ENTER_FRAME.getRootPane().setDefaultButton(this.bEnter);
         this.ENTER_FRAME.pack();
         this.ENTER_FRAME.setSize(this.ENTER_INIT_WIDTH, this.ENTER_INIT_HEIGHT);
         this.ENTER_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -244,6 +293,7 @@ public final class DnDView extends JFrame implements ActionListener {
         this.MAIN_FRAME = new JFrame();
         this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
         this.MAIN_FRAME.add(this.MAIN_PANEL);
+        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
         this.MAIN_FRAME.pack();
         this.MAIN_FRAME.setSize(768, 1024);
         this.MAIN_FRAME.setResizable(false);
@@ -265,11 +315,14 @@ public final class DnDView extends JFrame implements ActionListener {
         if (source.equals(this.bEnter.getActionCommand())) {
             this.controller.processEnterEvent();
         } else if (source.equals(this.bFinish.getActionCommand())) {
-            //TODO
+            this.view = false;
             this.ENTER_FRAME.dispose();
             this.MAIN_FRAME.setVisible(true);
+            this.controller.processFinishEvent();
         } else if (source.equals(this.bUndo.getActionCommand())) {
             this.controller.processUndoEvent();
+        } else if (source.equals(this.bNextPlayer.getActionCommand())) {
+            this.controller.processNextPlayerEvent();
         }
         //Action done being processed
         this.setCursor(Cursor.getDefaultCursor());
@@ -284,6 +337,12 @@ public final class DnDView extends JFrame implements ActionListener {
         this.bHoldTurn.addActionListener(this);
         this.bNextPlayer.addActionListener(this);
         this.bUndo.addActionListener(this);
+        this.bAddMob.addActionListener(this);
+        this.bRemoveMob.addActionListener(this);
+        this.bDamage.addActionListener(this);
+        this.bHeal.addActionListener(this);
+        this.bHoldTurn.addActionListener(this);
+        this.bInsertTurn.addActionListener(this);
     }
 
     public void registerObserver(DnDController controller) {
@@ -293,8 +352,9 @@ public final class DnDView extends JFrame implements ActionListener {
     /**
      * Pull info.
      */
-    @Override
-    public String getName() {
+    public String getNameFromField() {
+        String name = this.tNames.getText();
+        System.out.println("Retrieved: " + name);
         return this.tNames.getText();
     }
 
@@ -306,6 +366,7 @@ public final class DnDView extends JFrame implements ActionListener {
         } else {
             healthInt = Integer.parseInt(health);
         }
+        System.out.println("Added: " + healthInt + " health.");
         return healthInt;
     }
 
@@ -338,5 +399,38 @@ public final class DnDView extends JFrame implements ActionListener {
      */
     public void setTurn(int turn) {
         this.tTurns.setText("Turn: " + turn);
+    }
+
+    /**
+     * Set initiative order text area text.
+     */
+    public void setInitOrdText(Queue<String> q) {
+        String[] initOrd = new String[q.size()];
+        for (int pos = 0; pos < initOrd.length; pos++) {
+            initOrd[pos] = q.remove();
+        }
+        this.lTurnOrder.setListData(initOrd);
+    }
+
+    /**
+     * Which view is it in.
+     */
+    public boolean getView() {
+        return this.view;
+    }
+
+    /**
+     * Set Mob Menu
+     */
+    public void updateMobMenu(Map<String, Integer> mobMap, Queue<String> q) {
+        String[] mobs = new String[mobMap.size()];
+        int pos = 0;
+        for (String name : q) {
+            if (mobMap.containsKey(name)) {
+                mobs[pos] = name + ", " + mobMap.get(name);
+            }
+            pos++;
+        }
+        this.lMobMenu.setListData(mobs);
     }
 }

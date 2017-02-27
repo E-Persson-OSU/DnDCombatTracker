@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * The Controller class registers button actions and calls the appropriate model
  * methods.
@@ -22,12 +25,12 @@ public class DnDController {
         this.model = model;
     }
 
-    /*
-     * private controller methods
-     */
-    private void activateButtons() {
-        //TODO
-    }
+    //    /*
+    //     * private controller methods
+    //     */
+    //    private void activateButtons() {
+    //        //TODO
+    //    }
 
     /**
      * Refreshes view after each event.
@@ -38,16 +41,28 @@ public class DnDController {
      *            the DnD view.
      */
     private void updateViewToMatchModel(DnDModel model, DnDView view) {
-        this.view.clear();
-        view.enableButtons(model.lengthOfInitOrd() > 0);
-        this.view.setTurn(this.model.turn());
+        if (this.view.getView()) {
+            view.clear();
+            view.enableButtons(model.lengthOfInitOrd() > 0);
+            System.out.println("Updated Enter View.");
+        } else {
+            Queue<String> initOrd = new LinkedList<>();
+            for (String str : model.finish()) {
+                initOrd.add(str);
+            }
+            view.updateMobMenu(model.getMobMap(), model.getMobs());
+            view.setInitOrdText(initOrd);
+            view.setTurn(model.turn());
+            System.out.println("Updated Main View.");
+
+        }
     }
 
     /*
      * Process events
      */
     public void processEnterEvent() {
-        String name = this.view.getName();
+        String name = this.view.getNameFromField();
         int health = this.view.getHealth();
         this.model.enter(name, health);
         this.updateViewToMatchModel(this.model, this.view);
@@ -56,6 +71,15 @@ public class DnDController {
     public void processUndoEvent() {
         String name = this.model.undo();
         this.view.undone(name);
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processFinishEvent() {
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processNextPlayerEvent() {
+        this.model.nextPlayer();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
