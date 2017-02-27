@@ -1,8 +1,12 @@
 To do list:
 View---------------------------------------------------------------------------
-Find way to know which item on the list is being selected
-Use grabFocus method on Enter Action to set input cursor back to Name JTextField
 Set up Enter Menu to allow use of Tab key
+Disable RemoveMob when list is empty
+Add Radio buttons on Enter Menu to enable and disable Health/Add NPC
+Make views appear in center of the screen
+Make Dialogs appear in views
+Add button for adding NPC
+Separate menus for players, NPCs, and Mobs?
 
 Controller---------------------------------------------------------------------
 Add button processing methods for all buttons
