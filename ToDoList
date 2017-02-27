@@ -1,6 +1,8 @@
 To do list:
 View---------------------------------------------------------------------------
 Find way to know which item on the list is being selected
+Use grabFocus method on Enter Action to set input cursor back to Name JTextField
+Set up Enter Menu to allow use of Tab key
 
 Controller---------------------------------------------------------------------
 Add button processing methods for all buttons
