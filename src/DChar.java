@@ -1,6 +1,13 @@
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class made to contain character information for DnDCombatTracker.
+ *
+ * @author E-Persson-OSU
+ * @version 0.22
+ *
+ */
 public class DChar {
 
     private String name;

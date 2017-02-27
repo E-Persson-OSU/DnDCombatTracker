@@ -5,7 +5,7 @@ import java.util.List;
  * The model. This stores the data for the program.
  *
  * @author E-Persson-OSU
- *
+ * @version 0.22
  */
 public class DnDModel {
 

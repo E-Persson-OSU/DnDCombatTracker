@@ -27,7 +27,7 @@ import javax.swing.border.Border;
  * The view component of the DnDCombatTracker.
  *
  * @author E-Persson-OSU
- *
+ * @version 0.22
  *
  */
 @SuppressWarnings("serial")

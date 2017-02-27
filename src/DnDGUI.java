@@ -3,7 +3,7 @@
  * Model-View-Controller (MVC) design pattern including interfaces.
  *
  * @author E-Persson-OSU
- * @version 0.21
+ * @version 0.22
  */
 public final class DnDGUI {
 
