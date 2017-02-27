@@ -142,7 +142,7 @@ public class DnDModel {
             this.lOrd.add(new DChar("ENEMIES"));
             this.enemyIn = true;
         }
-        if (this.lOrd.size() == 0) {
+        if (this.lOrd.size() == 1) {
             this.lOrd.get(0).changeTop();
         }
         System.out.println("Added Mob: " + name);
@@ -153,8 +153,8 @@ public class DnDModel {
      */
     private void addToOrder(String name) {
         this.lOrd.add(new DChar(name));
-        if (this.lOrd.size() == 0) {
-            this.lOrd.get(0).changeTop();
+        if (this.lOrd.size() == 1) {
+           this.lOrd.get(0).changeTop();
         }
         System.out.println("Added Player: " + name);
     }
