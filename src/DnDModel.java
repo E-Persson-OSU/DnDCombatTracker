@@ -13,7 +13,7 @@ public class DnDModel {
      * Stores the initiative orders and queue for holding turns
      */
     //private List<DChar> lDead;
-    private List<DChar> lOrd, lMob, lHold;
+    private List<DChar> lOrd, lMob, lHold, lNPC;
 
     /**
      * Turn number
@@ -36,6 +36,7 @@ public class DnDModel {
     public DnDModel() {
         this.lOrd = new LinkedList<>();
         this.lMob = new LinkedList<>();
+        this.lNPC = new LinkedList<>();
         //this.lDead = new LinkedList<>();
         this.lHold = new LinkedList<>();
         this.turns = 1;
@@ -119,6 +120,14 @@ public class DnDModel {
         }
     }
 
+    public void addNPC(String name, int health) {
+        //TODO
+    }
+
+    public void removeNPC(String name, int health) {
+        //TODO
+    }
+
     //OTHER--------------------------------------------------------------------
     public int lengthOfInitOrd() {
         return this.lOrd.size();
@@ -151,6 +160,10 @@ public class DnDModel {
 
     public List<DChar> getMobList() {
         return this.lMob;
+    }
+
+    public List<DChar> getNPCList() {
+        return this.lNPC;
     }
 
     public List<DChar> getHoldList() {
@@ -216,7 +229,7 @@ public class DnDModel {
      */
     private void addToOrder(String name, int health, String type) {
         DChar npc = new DChar(name, health, type);
-        this.lMob.add(npc);
+        this.lNPC.add(npc);
         this.lOrd.add(npc);
         if (this.lOrd.size() == 1) {
             this.lOrd.get(0).changeTop();

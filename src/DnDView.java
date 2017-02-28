@@ -17,8 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
@@ -62,6 +64,17 @@ public final class DnDView extends JFrame
      * Scroll Panes
      */
     private final ScrollPane spMobMenu;
+
+    /**
+     * JPopupMenus
+     */
+    private JPopupMenu jpTurnOrder, jpMobMenu, jpHolds, jpTurns;
+
+    /**
+     * JMenuItems
+     */
+    private JMenuItem miAddStatus, miRemoveStatus, miMoveToHold, miMoveFromHold,
+            miDamage, miHeal, miAddMob, miRemoveMob, miAddNPC, miRemoveNPC;
 
     /**
      * Text area for displaying turn order
@@ -171,6 +184,16 @@ public final class DnDView extends JFrame
         //variables
         this.enterPlayer = true;
         this.view = true;
+
+        //Set JPopupMenu-------------------------------------------------------
+        this.jpHolds = new JPopupMenu();
+        this.jpMobMenu = new JPopupMenu();
+        this.jpTurnOrder = new JPopupMenu();
+        this.jpTurns = new JPopupMenu();
+
+        //Menu items
+
+        //Setup layouts
 
         //Set Properties-------------------------------------------------------
         /*
@@ -321,6 +344,20 @@ public final class DnDView extends JFrame
         /*
          * Set up JFrames
          */
+
+        //Set up main window
+        this.MAIN_FRAME = new JFrame();
+        this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
+        this.MAIN_FRAME.add(this.MAIN_PANEL);
+        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
+        this.MAIN_FRAME.pack();
+        this.MAIN_FRAME.setSize(768, 1024);
+        this.MAIN_FRAME.setResizable(true);
+        this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.MAIN_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
+                this.dim / 2 - this.getSize().height / 2);
+        this.MAIN_FRAME.setVisible(true);
+        this.MAIN_FRAME.setEnabled(false);
         //Set up the enter window
         this.ENTER_FRAME = new JFrame();
         this.ENTER_FRAME.setTitle("Enter Initiative Order");
@@ -332,8 +369,6 @@ public final class DnDView extends JFrame
         this.ENTER_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
                 this.dim / 2 - this.getSize().height / 2);
         this.ENTER_FRAME.setVisible(true);
-        //Set up main window
-
     }
 
     //ACTION PROCESSING--------------------------------------------------------
@@ -464,19 +499,8 @@ public final class DnDView extends JFrame
     //EVENT METHOD HELPERS-----------------------------------------------------
     public void finish() {
         this.view = false;
-        this.MAIN_FRAME = new JFrame();
-        this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
-        this.MAIN_FRAME.add(this.MAIN_PANEL);
-        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
-        this.MAIN_FRAME.pack();
-        this.MAIN_FRAME.setSize(768, 1024);
-        this.MAIN_FRAME.setResizable(true);
-        this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.ENTER_FRAME.dispose();
-        this.MAIN_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
-                this.dim / 2 - this.getSize().height / 2);
-        this.MAIN_FRAME.setVisible(true);
-
+        this.MAIN_FRAME.setEnabled(true);
     }
 
     public String getTurnOrderSelected() {
@@ -613,12 +637,30 @@ public final class DnDView extends JFrame
     /**
      * Set Mob Menu
      */
-    public void updateMobMenu(List<DChar> lMob) {
-        String[] arr = new String[lMob.size()];
-        int pos = 0;
-        for (DChar ch : lMob) {
-            arr[pos] = ch.toStringMobMenu();
+    public void updateMobMenu(List<DChar> lMob, List<DChar> lNPC) {
+
+        String[] arr;
+        if (lNPC.size() > 0) {
+            arr = new String[lMob.size() + lNPC.size() + 2];
+            int pos = 1;
+            arr[0] = "Mobs-----------";
+            for (DChar ch : lMob) {
+                arr[pos] = ch.toStringMobMenu();
+                pos++;
+            }
+            arr[pos] = "NPC------------";
             pos++;
+            for (DChar ch : lNPC) {
+                arr[pos] = ch.toStringMobMenu();
+                pos++;
+            }
+        } else {
+            arr = new String[lMob.size()];
+            int pos = 0;
+            for (DChar ch : lMob) {
+                arr[pos] = ch.toStringMobMenu();
+                pos++;
+            }
         }
         this.lMobMenu.setListData(arr);
     }
@@ -643,9 +685,13 @@ public final class DnDView extends JFrame
         } else {
             title = "Heal";
         }
-        int amount = Integer.parseInt(JOptionPane
-                .showInputDialog(this.MAIN_FRAME, "Enter Amount:", title));
-        return amount;
+        String amount = JOptionPane.showInputDialog(this.MAIN_FRAME,
+                "Enter " + title + ":");
+        int healthAmount = 0;
+        if (isInteger(amount)) {
+            healthAmount = Integer.parseInt(amount);
+        }
+        return healthAmount;
     }
 
     public int getMobSelected() {
@@ -662,5 +708,31 @@ public final class DnDView extends JFrame
             where = "mob";
         }
         return where;
+    }
+
+    /*
+     * Private helper methods
+     */
+    private static boolean isInteger(String s) {
+        return isInteger(s, 10);
+    }
+
+    private static boolean isInteger(String s, int radix) {
+        if (s.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 && s.charAt(i) == '-') {
+                if (s.length() == 1) {
+                    return false;
+                } else {
+                    continue;
+                }
+            }
+            if (Character.digit(s.charAt(i), radix) < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

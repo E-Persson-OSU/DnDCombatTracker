@@ -43,7 +43,7 @@ public class DnDController {
             view.enableEnterButtons(model.lengthOfInitOrd() > 0);
             //System.out.println("Updated Enter View.");
         } else {
-            view.updateMobMenu(model.getMobList());
+            view.updateMobMenu(model.getMobList(), model.getNPCList());
             view.setInitOrdText(model.finish());
             view.updateHoldList(model.getHoldList());
             view.setTurn(model.turn());
