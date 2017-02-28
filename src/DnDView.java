@@ -63,7 +63,7 @@ public final class DnDView extends JFrame
     /**
      * Scroll Panes
      */
-    private final ScrollPane spMobMenu;
+    private final ScrollPane spMobMenu, spNPCMenu, spTurnOrder, spHolds;
 
     /**
      * JPopupMenus
@@ -84,7 +84,7 @@ public final class DnDView extends JFrame
     /**
      * Lets try a list
      */
-    private final JList<String> lHolds, lTurnOrder, lMobMenu;
+    private final JList<String> lHolds, lTurnOrder, lMobMenu, lNPCMenu;
 
     /**
      * Buttons
@@ -160,6 +160,7 @@ public final class DnDView extends JFrame
         this.lTurnOrder = new JList<String>();
         this.lHolds = new JList<String>();
         this.lMobMenu = new JList<String>();
+        this.lNPCMenu = new JList<String>();
 
         /*
          * Buttons
@@ -264,8 +265,15 @@ public final class DnDView extends JFrame
         /*
          * Main window
          */
-        this.MAIN_PANEL = new JPanel(new GridLayout(1, 2));
+        this.MAIN_PANEL = new JPanel(new GridLayout(2, 1));
+
+        /*
+         * ScrollPanes Main Window
+         */
         this.spMobMenu = new ScrollPane();
+        this.spHolds = new ScrollPane();
+        this.spNPCMenu = new ScrollPane();
+        this.spTurnOrder = new ScrollPane();
 
         /*
          * Panels for enter window
@@ -351,7 +359,7 @@ public final class DnDView extends JFrame
         this.MAIN_FRAME.add(this.MAIN_PANEL);
         this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
         this.MAIN_FRAME.pack();
-        this.MAIN_FRAME.setSize(768, 1024);
+        //this.MAIN_FRAME.setSize(768, 1024);
         this.MAIN_FRAME.setResizable(true);
         this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.MAIN_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
