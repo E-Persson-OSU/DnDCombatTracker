@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Class made to contain character information for DnDCombatTracker.
@@ -12,39 +11,35 @@ public class DChar {
 
     private String name;
 
-    private boolean top;
-
     /**
-     * player = true, mob = false
+     * PC, NPC, or Mob
      */
-    private boolean player;
+    private String type;
 
-    private Map<String, Integer> statusConditions;
+    private int initiative;
 
-    private int health;
+    private int maxHP;
 
-    public DChar(String name) {
+    private int HP;
+
+    private int tempHP;
+
+    boolean top;
+
+    private List<String> conditions;
+
+    public DChar(String name, String type, int initiative, int maxHP, int HP,
+            int tempHP, List<String> conditions) {
         this.name = name;
+        this.type = type;
         this.top = false;
-        this.statusConditions = new HashMap<String, Integer>();
-        this.player = true;
-        this.health = 0;
-    }
-
-    public DChar(String name, int health) {
-        this.name = name;
-        this.top = false;
-        this.statusConditions = new HashMap<String, Integer>();
-        this.player = false;
-        this.health = health;
-    }
-
-    public DChar(String name, int health, String type) {
-        this.name = name;
-        this.top = false;
-        this.statusConditions = new HashMap<String, Integer>();
-        this.player = true;
-        this.health = health;
+        this.initiative = initiative;
+        this.maxHP = maxHP;
+        this.HP = HP;
+        this.tempHP = tempHP;
+        for (String cond : conditions) {
+            this.conditions.add(cond);
+        }
     }
 
     @Override
@@ -52,16 +47,16 @@ public class DChar {
         return this.name;
     }
 
-    public String toStringMobMenu() {
-        String name = this.name;
-        if (this.health <= 0) {
-            name = name + ", *DEAD*";
-        } else {
-            name = name + ", " + this.health;
-        }
-        return name;
-    }
-
+    //    public String toStringMobMenu() {
+    //        String name = this.name;
+    //        if (this.health <= 0) {
+    //            name = name + ", *DEAD*";
+    //        } else {
+    //            name = name + ", " + this.health;
+    //        }
+    //        return name;
+    //    }
+    //
     public String toStringOrder() {
         String name = this.name;
         if (this.top) {
@@ -74,6 +69,38 @@ public class DChar {
         return this.name;
     }
 
+    public String toStringMob() {
+        String name = this.name;
+        if (this.HP + this.tempHP == 0) {
+            name += "*DEAD*";
+        } else if (this.tempHP == 0 && this.HP > 0) {
+            name = name + ", (" + this.tempHP + ")" + this.HP + "/"
+                    + this.maxHP;
+        } else {
+            name = name + ", " + this.HP + "/" + this.maxHP;
+        }
+        for (String cond : this.conditions) {
+            name += " *" + cond + "* ";
+        }
+        return name;
+    }
+
+    public String toStringNPC() {
+        String name = this.name;
+        if (this.HP + this.tempHP == 0) {
+            name += "*DEAD*";
+        } else if (this.tempHP == 0 && this.HP > 0) {
+            name = name + ", (" + this.tempHP + ")" + this.HP + "/"
+                    + this.maxHP;
+        } else {
+            name = name + ", " + this.HP + "/" + this.maxHP;
+        }
+        for (String cond : this.conditions) {
+            name += " *" + cond + "* ";
+        }
+        return name;
+    }
+
     public boolean top() {
         return this.top;
     }
@@ -82,19 +109,34 @@ public class DChar {
         this.top = !this.top;
     }
 
-    public Map<String, Integer> returnStatus() {
-        return this.statusConditions;
+    public List returnStatus() {
+        return this.conditions;
     }
 
-    public boolean player() {
-        return this.player;
+    public String type() {
+        return this.type;
     }
 
     public int health() {
-        return this.health;
+        return this.HP;
     }
 
     public void changeHealth(int amount) {
-        this.health += amount;
+        this.tempHP += amount;
+        if (this.tempHP < 0) {
+            this.HP += this.tempHP;
+            this.tempHP = 0;
+        }
+        if (this.HP < 0) {
+            this.HP = 0;
+        }
     }
+
+    /*
+     * Save Data
+     */
+    public void saveData() {
+        //TODO
+    }
+
 }

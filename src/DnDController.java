@@ -57,17 +57,12 @@ public class DnDController {
     /*
      * Process events
      */
-    public void processEnterEvent() {
-        this.model.enter(this.view.getNameFromField(), this.view.getHealth(),
-                this.view.enterWhere());
-        this.view.setFocusToName();
-        this.updateViewToMatchModel(this.model, this.view);
+    public void processNewEvent() {
+        //TODO
     }
 
-    public void processUndoEvent() {
-        String name = this.model.undo();
-        this.view.undone(name);
-        this.updateViewToMatchModel(this.model, this.view);
+    public void processExistingEvent() {
+        //TODO
     }
 
     public void processFinishEvent() {
@@ -75,8 +70,8 @@ public class DnDController {
         this.updateViewToMatchModel(this.model, this.view);
     }
 
-    public void processNextPlayerEvent() {
-        this.model.nextPlayer();
+    public void processNextEvent() {
+        this.model.next();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
@@ -103,12 +98,14 @@ public class DnDController {
     }
 
     public void processAddMobEvent(String name, int health) {
-        this.model.addMob(name, health);
+        //TODO
+        //this.model.addMob(name, health);
         this.updateViewToMatchModel(this.model, this.view);
     }
 
     public void processRemoveMobEvent(int pos) {
-        this.model.removeMob(pos);
+        //TODO
+        //this.model.removeMob(pos);
         this.updateViewToMatchModel(this.model, this.view);
     }
 

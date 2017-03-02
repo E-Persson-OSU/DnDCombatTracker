@@ -76,7 +76,7 @@ public final class DnDView extends JFrame
     /**
      * Buttons
      */
-    private final JButton bEnter, bUndo, bNextPlayer, bHoldTurn, bFinish,
+    private final JButton bNew, bExisting, bNext, bHoldTurn, bFinish,
             bInsertTurn, bDamage, bHeal, bAddMob, bRemoveMob;
 
     /**
@@ -152,8 +152,8 @@ public final class DnDView extends JFrame
          * Buttons
          */
         //enter window buttons
-        this.bEnter = new JButton("Enter");
-        this.bUndo = new JButton("Undo");
+        this.bNew = new JButton("Enter");
+        this.bExisting = new JButton("Undo");
         this.bFinish = new JButton("Finish");
         this.rbPlayer = new JRadioButton("Player");
         this.rbNPC = new JRadioButton("NPC");
@@ -162,7 +162,7 @@ public final class DnDView extends JFrame
         //main window buttons
         this.bHoldTurn = new JButton("Hold Turn");
         this.bInsertTurn = new JButton("Insert Turn");
-        this.bNextPlayer = new JButton("Next Player");
+        this.bNext = new JButton("Next Player");
         this.bAddMob = new JButton("Add Mob");
         this.bDamage = new JButton("Damage");
         this.bHeal = new JButton("Heal");
@@ -176,12 +176,12 @@ public final class DnDView extends JFrame
         /*
          * Buttons
          */
-        this.bUndo.setEnabled(false);
+        this.bExisting.setEnabled(false);
         this.bFinish.setEnabled(false);
         this.rbPlayer.setSelected(true);
         this.bHoldTurn.setFont(this.FONT_HEADER);
         this.bInsertTurn.setFont(this.FONT_HEADER);
-        this.bNextPlayer.setFont(this.FONT_HEADER);
+        this.bNext.setFont(this.FONT_HEADER);
         this.bAddMob.setFont(this.FONT_HEADER);
         this.bRemoveMob.setFont(this.FONT_HEADER);
         this.bDamage.setFont(this.FONT_HEADER);
@@ -248,9 +248,6 @@ public final class DnDView extends JFrame
          * Panels for enter window
          */
         JPanel enterButtons = new JPanel(new GridLayout(1, 3));
-        JPanel enterFields = new JPanel(new GridLayout(2, 2));
-        JPanel enterRadioButtons = new JPanel(new GridLayout(3, 1));
-        JPanel enterTop = new JPanel(new BorderLayout());
 
         /*
          * Panels for main window
@@ -264,21 +261,6 @@ public final class DnDView extends JFrame
         this.MAIN_RIGHT_BOTTOM = new JPanel(new BorderLayout());
 
         //Buttons--------------------------------------------------------------
-        /*
-         * Add buttons and fields for enter window
-         */
-        enterButtons.add(this.bEnter);
-        enterButtons.add(this.bUndo);
-        enterButtons.add(this.bFinish);
-        enterFields.add(this.tSpecName);
-        enterFields.add(this.tNames);
-        enterFields.add(this.tSpecHealth);
-        enterFields.add(this.tHealth);
-        enterRadioButtons.add(this.rbPlayer);
-        enterRadioButtons.add(this.rbNPC);
-        enterRadioButtons.add(this.rbMob);
-        enterTop.add(enterRadioButtons, BorderLayout.WEST);
-        enterTop.add(enterFields);
 
         /*
          * Add buttons and fields for main window
@@ -304,7 +286,7 @@ public final class DnDView extends JFrame
         this.MAIN_RIGHT_MIDDLE.add(this.spMobMenu);
         this.MAIN_RIGHT_MIDDLE.add(this.MAIN_RIGHT_MIDDLE_BUTTONS);
         //right bottom
-        this.MAIN_RIGHT_BOTTOM.add(this.bNextPlayer);
+        this.MAIN_RIGHT_BOTTOM.add(this.bNext);
         //right
         this.MAIN_RIGHT_PANEL.add(this.MAIN_RIGHT_TOP);
         this.MAIN_RIGHT_PANEL.add(this.MAIN_RIGHT_MIDDLE);
@@ -315,7 +297,6 @@ public final class DnDView extends JFrame
         /*
          * Add panels to enter panel
          */
-        this.ENTER_PANEL.add(enterTop);
         this.ENTER_PANEL.add(enterButtons);
 
         /*
@@ -325,7 +306,7 @@ public final class DnDView extends JFrame
         this.ENTER_FRAME = new JFrame();
         this.ENTER_FRAME.setTitle("Enter Initiative Order");
         this.ENTER_FRAME.add(this.ENTER_PANEL);
-        this.ENTER_FRAME.getRootPane().setDefaultButton(this.bEnter);
+        this.ENTER_FRAME.getRootPane().setDefaultButton(this.bNew);
         this.ENTER_FRAME.pack();
         this.ENTER_FRAME.setSize(this.ENTER_INIT_WIDTH, this.ENTER_INIT_HEIGHT);
         this.ENTER_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -349,15 +330,19 @@ public final class DnDView extends JFrame
          */
         String source = event.getActionCommand();
         //System.out.println(source);
-        if (source.equals(this.bEnter.getActionCommand())
+        if (source.equals(this.bNew.getActionCommand())
                 && this.tNames.getText().length() > 0) {
-            this.controller.processEnterEvent();
+            //TODO
+            this.controller.processNewEvent();
         } else if (source.equals(this.bFinish.getActionCommand())) {
+            //TODO
             this.controller.processFinishEvent();
-        } else if (source.equals(this.bUndo.getActionCommand())) {
-            this.controller.processUndoEvent();
-        } else if (source.equals(this.bNextPlayer.getActionCommand())) {
-            this.controller.processNextPlayerEvent();
+        } else if (source.equals(this.bExisting.getActionCommand())) {
+            //TODO
+            this.controller.processExistingEvent();
+        } else if (source.equals(this.bNext.getActionCommand())) {
+            //TODO
+            this.controller.processNextEvent();
         } else if (source.equals(this.bHoldTurn.getActionCommand())) {
             this.controller
                     .processHoldTurnEvent(this.lTurnOrder.getSelectedIndex());
@@ -467,7 +452,7 @@ public final class DnDView extends JFrame
         this.MAIN_FRAME = new JFrame();
         this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
         this.MAIN_FRAME.add(this.MAIN_PANEL);
-        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNextPlayer);
+        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNext);
         this.MAIN_FRAME.pack();
         this.MAIN_FRAME.setSize(768, 1024);
         this.MAIN_FRAME.setResizable(true);
@@ -506,10 +491,10 @@ public final class DnDView extends JFrame
      */
     private void addActionListenerToButtons() {
         this.bFinish.addActionListener(this);
-        this.bEnter.addActionListener(this);
+        this.bNew.addActionListener(this);
         this.bHoldTurn.addActionListener(this);
-        this.bNextPlayer.addActionListener(this);
-        this.bUndo.addActionListener(this);
+        this.bNext.addActionListener(this);
+        this.bExisting.addActionListener(this);
         this.bAddMob.addActionListener(this);
         this.bRemoveMob.addActionListener(this);
         this.bDamage.addActionListener(this);
@@ -567,7 +552,7 @@ public final class DnDView extends JFrame
      * Enable undo and finish if InitOrd > 0
      */
     public void enableEnterButtons(Boolean enable) {
-        this.bUndo.setEnabled(enable);
+        this.bExisting.setEnabled(enable);
         this.bFinish.setEnabled(enable);
     }
 
@@ -579,7 +564,7 @@ public final class DnDView extends JFrame
         this.bInsertTurn.setEnabled(lHoldsSize > 0);
         this.bDamage.setEnabled(lMobsSize > 0);
         this.bHeal.setEnabled(lMobsSize > 0);
-        this.bNextPlayer.setEnabled(lOrdSize > 0);
+        this.bNext.setEnabled(lOrdSize > 0);
         this.bRemoveMob.setEnabled(lMobsSize > 0);
     }
 
@@ -617,7 +602,7 @@ public final class DnDView extends JFrame
         String[] arr = new String[lMob.size()];
         int pos = 0;
         for (DChar ch : lMob) {
-            arr[pos] = ch.toStringMobMenu();
+            arr[pos] = ch.toStringMob();
             pos++;
         }
         this.lMobMenu.setListData(arr);

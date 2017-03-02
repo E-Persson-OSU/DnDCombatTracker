@@ -13,7 +13,7 @@ public class DnDModel {
      * Stores the initiative orders and queue for holding turns
      */
     //private List<DChar> lDead;
-    private List<DChar> lOrd, lMob, lHold;
+    private List<DChar> lOrd, lMob, lHold, lNPC, lPC;
 
     /**
      * Turn number
@@ -40,17 +40,15 @@ public class DnDModel {
         this.lHold = new LinkedList<>();
         this.turns = 1;
         this.enemyIn = false;
-        this.enemies = new DChar("ENEMIES");
+        this.enemies = new DChar("ENEMIES", "", 0, 0, 0, 0, null);
     }
 
     //BUTTONS------------------------------------------------------------------
-    public void enter(String name, int health, String type) {
+    public void enter(String name, String type, int initiative, int maxHP,
+            int HP, int tempHP, List<String> conditions) {
         if (type.equals("player")) {
-            this.addToOrder(name);
-        } else if (type.equals("mob")) {
-            this.addToOrder(name, health);
-        } else if (type.equals("npc")) {
-            this.addToOrder(name, health, type);
+            this.addToOrder(name, type, initiative, maxHP, HP, tempHP,
+                    conditions);
         }
         //        for (DChar ch : this.lOrd) {
         //            System.out.println(ch.toString());
@@ -95,28 +93,12 @@ public class DnDModel {
         this.moveToInitOrd(pos);
     }
 
-    public List<DChar> nextPlayer() {
+    public List<DChar> next() {
         this.lOrd.add(this.lOrd.remove(0));
         if (this.lOrd.get(0).top()) {
             this.incrementTurns();
         }
         return this.lOrd;
-    }
-
-    public void addMob(String name, int health) {
-        this.addToOrder(name, health);
-    }
-
-    public void removeMob(int pos) {
-        if (pos < 0) {
-            pos = 0;
-        }
-        this.lMob.remove(pos);
-        if (this.lMob.size() == 0) {
-            this.lMob = new LinkedList<>();
-            this.lOrd.remove(this.enemies);
-            this.enemyIn = false;
-        }
     }
 
     //OTHER--------------------------------------------------------------------
@@ -188,40 +170,26 @@ public class DnDModel {
     /**
      * Add mob
      */
-    private void addToOrder(String name, int health) {
-        this.lMob.add(new DChar(name, health));
-        if (!this.enemyIn) {
+    private void addToOrder(String name, String type, int initiative, int maxHP,
+            int HP, int tempHP, List<String> conditions) {
+        if (type.equals("PC")) {
+            this.lPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP,
+                    conditions));
+        } else if (type.equals("NPC")) {
+            this.lNPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP,
+                    conditions));
+        } else if (type.equals("Mob")) {
+            this.lMob.add(new DChar(name, type, initiative, maxHP, HP, tempHP,
+                    conditions));
+        }
+
+        if (!this.enemyIn && type.equals("Mob")) {
             this.lOrd.add(this.enemies);
             this.enemyIn = true;
         }
         if (this.lOrd.size() == 1) {
             this.lOrd.get(0).changeTop();
         }
-        //System.out.println("Added Mob: " + name);
-    }
-
-    /**
-     * Add player
-     */
-    private void addToOrder(String name) {
-        this.lOrd.add(new DChar(name));
-        if (this.lOrd.size() == 1) {
-            this.lOrd.get(0).changeTop();
-        }
-        //System.out.println("Added Player: " + name);
-    }
-
-    /**
-     * Add npc
-     */
-    private void addToOrder(String name, int health, String type) {
-        DChar npc = new DChar(name, health, type);
-        this.lMob.add(npc);
-        this.lOrd.add(npc);
-        if (this.lOrd.size() == 1) {
-            this.lOrd.get(0).changeTop();
-        }
-        //System.out.println("Added NPC: " + name);
     }
 
     /**
