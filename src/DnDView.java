@@ -14,12 +14,12 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -38,12 +38,18 @@ public final class DnDView extends JFrame
      * JFrame
      */
     private final JFrame ENTER_FRAME;
+    private final JFrame ENTER_FORM;
     private JFrame MAIN_FRAME;
 
     /**
      * JPanels
      */
+    //Enter Frame
     private final JPanel ENTER_PANEL;
+    //Enter Form
+    private final JPanel ENTER_FORM_MAIN, ENTER_FORM_TEXT, ENTER_FORM_BUTTONS,
+            ENTER_FORM_INIT_PANEL;
+    //Main Frame
     private final JPanel MAIN_PANEL;
     private final JPanel MAIN_LEFT_PANEL;
     private final JPanel MAIN_RIGHT_PANEL;
@@ -52,11 +58,19 @@ public final class DnDView extends JFrame
     private final JPanel MAIN_RIGHT_MIDDLE_BUTTONS;
 
     /**
-     * Text areas for entering names and health
+     * JTabbedPanel
      */
-    private final JTextField tNames, tSpecName, tSpecHealth, tTurns,
-            tSpecTurnOrder, tSpecHoldOrder;
-    private final JFormattedTextField tHealth;
+    private final JTabbedPane tbMobNPCHold;
+
+    /**
+     * Text Fields
+     */
+    //Main frame
+    private final JTextField tTurns, tSpecTurnOrder, tSpecHoldOrder, tSpecMob,
+            tSpecNPC;
+    //Enter Form
+    private final JTextField tNames, tSpecName, tSpecHP, tHP, tSpecTempHP,
+            tTempHP, tSpecMaxHP, tMaxHP, tSpecInitRoll, tInitRoll;
 
     /**
      * Scroll Panes
@@ -64,20 +78,20 @@ public final class DnDView extends JFrame
     private final ScrollPane spMobMenu;
 
     /**
-     * Text area for displaying turn order
+     * JLists to contain Holds, Turn Order, Mobs, and NPCs
      */
-    //private final JTextArea taHolding;
-
-    /**
-     * Lets try a list
-     */
-    private final JList<String> lHolds, lTurnOrder, lMobMenu;
+    private final JList<String> lHolds, lTurnOrder, lMobMenu, lNPC;
 
     /**
      * Buttons
      */
-    private final JButton bNew, bExisting, bNext, bHoldTurn, bFinish,
-            bInsertTurn, bDamage, bHeal, bAddMob, bRemoveMob;
+    //Enter Frame
+    private final JButton bNew, bExisting, bFinish;
+    //Enter Form
+    private final JButton bAdd, bAddAndSave, bClear, bRoll;
+    //Main Frame
+    private final JButton bNext, bHoldTurn, bInsertTurn, bDamageMob, bHealMob,
+            bAddMob, bRemoveMob, bDamageNPC, bHealNPC, bAddNPC, bRemoveNPC;
 
     /**
      * Radio Buttons
@@ -92,7 +106,7 @@ public final class DnDView extends JFrame
     /**
      * Some final fields
      */
-    private final int ENTER_MENU_ROWS = 2, ENTER_MENU_COLM = 1,
+    private final int ENTER_MENU_ROWS = 1, ENTER_MENU_COLM = 3,
             TEXT_FIELD_WIDTH = 15, ENTER_INIT_HEIGHT = 192,
             ENTER_INIT_WIDTH = 512;
     //    private final int VERT_GRIDS_ENTER = 2, HOR_GRIDS_ENTER = 1,
@@ -126,20 +140,24 @@ public final class DnDView extends JFrame
         /*
          * Text fields
          */
-        //Initialize fields
-        this.tNames = new JTextField();
+        //Enter Form
         this.tSpecName = new JTextField("Name:");
-        this.tSpecHealth = new JTextField("Health: ");
+        this.tNames = new JTextField();
+        this.tSpecHP = new JTextField("Health: ");
         this.healthFormat = NumberFormat.getIntegerInstance();
-        this.tHealth = new JFormattedTextField(this.healthFormat);
-        this.tSpecHoldOrder = new JTextField("Add or Hold: ");
+        this.tHP = new JTextField();
+        this.tSpecMaxHP = new JTextField();
+        this.tMaxHP = new JTextField();
+        this.tSpecTempHP = new JTextField();
+        this.tTempHP = new JTextField();
+        this.tSpecInitRoll = new JTextField();
+        this.tInitRoll = new JTextField();
+
+        //Main Frame
+        this.tSpecHoldOrder = new JTextField("Hold: ");
+        this.tSpecMob = new JTextField("Mobs: ");
         this.tTurns = new JTextField("Turn: 1");
         this.tSpecTurnOrder = new JTextField("Initiative Order: ");
-
-        /*
-         * Text areas
-         */
-        //this.taHolding = new JTextArea();
 
         /*
          * List
@@ -152,9 +170,14 @@ public final class DnDView extends JFrame
          * Buttons
          */
         //enter window buttons
-        this.bNew = new JButton("Enter");
-        this.bExisting = new JButton("Undo");
+        this.bNew = new JButton("New");
+        this.bExisting = new JButton("Existing");
         this.bFinish = new JButton("Finish");
+
+        //Enter Form Buttons
+        this.bAdd = new JButton("Add");
+        this.bAddAndSave = new JButton("Save and Add");
+        this.bClear = new JButton("Clear");
         this.rbPlayer = new JRadioButton("Player");
         this.rbNPC = new JRadioButton("NPC");
         this.rbMob = new JRadioButton("Mob");
@@ -164,8 +187,8 @@ public final class DnDView extends JFrame
         this.bInsertTurn = new JButton("Insert Turn");
         this.bNext = new JButton("Next Player");
         this.bAddMob = new JButton("Add Mob");
-        this.bDamage = new JButton("Damage");
-        this.bHeal = new JButton("Heal");
+        this.bDamageMob = new JButton("Damage");
+        this.bHealMob = new JButton("Heal");
         this.bRemoveMob = new JButton("Remove Mob");
 
         //variables
@@ -176,16 +199,20 @@ public final class DnDView extends JFrame
         /*
          * Buttons
          */
-        this.bExisting.setEnabled(false);
-        this.bFinish.setEnabled(false);
+        //Enter Menu
+        this.bNew.setEnabled(true);
+        this.bExisting.setEnabled(true);
+        this.bFinish.setEnabled(true);
+        //Enter Form
         this.rbPlayer.setSelected(true);
+        //Main Form
         this.bHoldTurn.setFont(this.FONT_HEADER);
         this.bInsertTurn.setFont(this.FONT_HEADER);
         this.bNext.setFont(this.FONT_HEADER);
         this.bAddMob.setFont(this.FONT_HEADER);
         this.bRemoveMob.setFont(this.FONT_HEADER);
-        this.bDamage.setFont(this.FONT_HEADER);
-        this.bHeal.setFont(this.FONT_HEADER);
+        this.bDamageMob.setFont(this.FONT_HEADER);
+        this.bHealMob.setFont(this.FONT_HEADER);
 
         /*
          * Text Areas
@@ -201,9 +228,9 @@ public final class DnDView extends JFrame
         /*
          * Text Fields
          */
-        this.tHealth.setColumns(this.TEXT_FIELD_WIDTH);
-        this.tHealth.setFont(this.FONT_PLAIN);
-        this.tHealth.setEnabled(false);
+        this.tHP.setColumns(this.TEXT_FIELD_WIDTH);
+        this.tHP.setFont(this.FONT_PLAIN);
+        this.tHP.setEnabled(false);
 
         this.tNames.setColumns(this.TEXT_FIELD_WIDTH);
         this.tNames.setFont(this.FONT_PLAIN);
@@ -211,8 +238,8 @@ public final class DnDView extends JFrame
         this.tSpecName.setEditable(false);
         this.tSpecName.setFont(this.FONT_HEADER);
 
-        this.tSpecHealth.setEditable(false);
-        this.tSpecHealth.setFont(this.FONT_HEADER);
+        this.tSpecHP.setEditable(false);
+        this.tSpecHP.setFont(this.FONT_HEADER);
 
         this.tTurns.setEditable(false);
         this.tTurns.setFont(this.FONT_HEADER);
@@ -280,8 +307,8 @@ public final class DnDView extends JFrame
         //right middle
         this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bAddMob);
         this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bRemoveMob);
-        this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bDamage);
-        this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bHeal);
+        this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bDamageMob);
+        this.MAIN_RIGHT_MIDDLE_BUTTONS.add(this.bHealMob);
         this.spMobMenu.add(this.lMobMenu);
         this.MAIN_RIGHT_MIDDLE.add(this.spMobMenu);
         this.MAIN_RIGHT_MIDDLE.add(this.MAIN_RIGHT_MIDDLE_BUTTONS);
@@ -304,11 +331,11 @@ public final class DnDView extends JFrame
          */
         //Set up the enter window
         this.ENTER_FRAME = new JFrame();
-        this.ENTER_FRAME.setTitle("Enter Initiative Order");
+        this.ENTER_FRAME.setTitle("Enter Combatants");
         this.ENTER_FRAME.add(this.ENTER_PANEL);
         this.ENTER_FRAME.getRootPane().setDefaultButton(this.bNew);
         this.ENTER_FRAME.pack();
-        this.ENTER_FRAME.setSize(this.ENTER_INIT_WIDTH, this.ENTER_INIT_HEIGHT);
+        //        this.ENTER_FRAME.setSize(this.ENTER_INIT_WIDTH, this.ENTER_INIT_HEIGHT);
         this.ENTER_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.ENTER_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
                 this.dim / 2 - this.getSize().height / 2);
@@ -330,63 +357,63 @@ public final class DnDView extends JFrame
          */
         String source = event.getActionCommand();
         //System.out.println(source);
-        if (source.equals(this.bNew.getActionCommand())
-                && this.tNames.getText().length() > 0) {
-            //TODO
-            this.controller.processNewEvent();
-        } else if (source.equals(this.bFinish.getActionCommand())) {
-            //TODO
-            this.controller.processFinishEvent();
-        } else if (source.equals(this.bExisting.getActionCommand())) {
-            //TODO
-            this.controller.processExistingEvent();
-        } else if (source.equals(this.bNext.getActionCommand())) {
-            //TODO
-            this.controller.processNextEvent();
-        } else if (source.equals(this.bHoldTurn.getActionCommand())) {
-            this.controller
-                    .processHoldTurnEvent(this.lTurnOrder.getSelectedIndex());
-        } else if (source.equals(this.bInsertTurn.getActionCommand())) {
-            this.controller
-                    .processInsertTurnEvent(this.lHolds.getSelectedIndex());
-        } else if (source.equals(this.bDamage.getActionCommand())) {
-            this.controller.processDamageEvent();
-        } else if (source.equals(this.bHeal.getActionCommand())) {
-            this.controller.processHealEvent();
-        } else if (source.equals(this.bAddMob.getActionCommand())) {
-            this.controller.processAddMobEvent(this.addedMobName(),
-                    this.addedMobHealth());
-        } else if (source.equals(this.bRemoveMob.getActionCommand())) {
-            this.controller
-                    .processRemoveMobEvent(this.lMobMenu.getSelectedIndex());
-        } else if (source.equals(this.rbPlayer.getActionCommand())) {
-            this.enterPlayer = true;
-            this.enterNPC = false;
-            this.enterMob = false;
-            this.tHealth.setEnabled(false);
-            this.rbPlayer.setSelected(true);
-            this.rbNPC.setSelected(false);
-            this.rbMob.setSelected(false);
-            this.tNames.grabFocus();
-        } else if (source.equals(this.rbNPC.getActionCommand())) {
-            this.enterPlayer = false;
-            this.enterNPC = true;
-            this.enterMob = false;
-            this.tHealth.setEnabled(true);
-            this.rbPlayer.setSelected(false);
-            this.rbNPC.setSelected(true);
-            this.rbMob.setSelected(false);
-            this.tNames.grabFocus();
-        } else if (source.equals(this.rbMob.getActionCommand())) {
-            this.enterPlayer = false;
-            this.enterNPC = false;
-            this.enterMob = true;
-            this.tHealth.setEnabled(true);
-            this.rbPlayer.setSelected(false);
-            this.rbNPC.setSelected(false);
-            this.rbMob.setSelected(true);
-            this.tNames.grabFocus();
-        }
+        //        if (source.equals(this.bNew.getActionCommand())
+        //                && this.tNames.getText().length() > 0) {
+        //            //TODO
+        //            this.controller.processNewEvent();
+        //        } else if (source.equals(this.bFinish.getActionCommand())) {
+        //            //TODO
+        //            this.controller.processFinishEvent();
+        //        } else if (source.equals(this.bExisting.getActionCommand())) {
+        //            //TODO
+        //            this.controller.processExistingEvent();
+        //        } else if (source.equals(this.bNext.getActionCommand())) {
+        //            //TODO
+        //            this.controller.processNextEvent();
+        //        } else if (source.equals(this.bHoldTurn.getActionCommand())) {
+        //            this.controller
+        //                    .processHoldTurnEvent(this.lTurnOrder.getSelectedIndex());
+        //        } else if (source.equals(this.bInsertTurn.getActionCommand())) {
+        //            this.controller
+        //                    .processInsertTurnEvent(this.lHolds.getSelectedIndex());
+        //        } else if (source.equals(this.bDamageMob.getActionCommand())) {
+        //            this.controller.processDamageEvent();
+        //        } else if (source.equals(this.bHealMob.getActionCommand())) {
+        //            this.controller.processHealEvent();
+        //        } else if (source.equals(this.bAddMob.getActionCommand())) {
+        //            this.controller.processAddMobEvent(this.addedMobName(),
+        //                    this.addedMobHealMobth());
+        //        } else if (source.equals(this.bRemoveMob.getActionCommand())) {
+        //            this.controller
+        //                    .processRemoveMobEvent(this.lMobMenu.getSelectedIndex());
+        //        } else if (source.equals(this.rbPlayer.getActionCommand())) {
+        //            this.enterPlayer = true;
+        //            this.enterNPC = false;
+        //            this.enterMob = false;
+        //            this.tHP.setEnabled(false);
+        //            this.rbPlayer.setSelected(true);
+        //            this.rbNPC.setSelected(false);
+        //            this.rbMob.setSelected(false);
+        //            this.tNames.grabFocus();
+        //        } else if (source.equals(this.rbNPC.getActionCommand())) {
+        //            this.enterPlayer = false;
+        //            this.enterNPC = true;
+        //            this.enterMob = false;
+        //            this.tHP.setEnabled(true);
+        //            this.rbPlayer.setSelected(false);
+        //            this.rbNPC.setSelected(true);
+        //            this.rbMob.setSelected(false);
+        //            this.tNames.grabFocus();
+        //        } else if (source.equals(this.rbMob.getActionCommand())) {
+        //            this.enterPlayer = false;
+        //            this.enterNPC = false;
+        //            this.enterMob = true;
+        //            this.tHP.setEnabled(true);
+        //            this.rbPlayer.setSelected(false);
+        //            this.rbNPC.setSelected(false);
+        //            this.rbMob.setSelected(true);
+        //            this.tNames.grabFocus();
+        //        }
         //Action done being processed
         this.setCursor(Cursor.getDefaultCursor());
     }
@@ -480,7 +507,7 @@ public final class DnDView extends JFrame
         return JOptionPane.showInputDialog(this.MAIN_FRAME, "Enter Mob Name: ");
     }
 
-    public int addedMobHealth() {
+    public int addedMobHealMobth() {
         int amount = Integer.parseInt(JOptionPane
                 .showInputDialog(this.MAIN_FRAME, "Enter Mob Health:"));
         return amount;
@@ -497,8 +524,8 @@ public final class DnDView extends JFrame
         this.bExisting.addActionListener(this);
         this.bAddMob.addActionListener(this);
         this.bRemoveMob.addActionListener(this);
-        this.bDamage.addActionListener(this);
-        this.bHeal.addActionListener(this);
+        this.bDamageMob.addActionListener(this);
+        this.bHealMob.addActionListener(this);
         this.bInsertTurn.addActionListener(this);
         this.rbMob.addActionListener(this);
         this.rbNPC.addActionListener(this);
@@ -523,12 +550,12 @@ public final class DnDView extends JFrame
         return this.tNames.getText();
     }
 
-    public int getHealth() {
-        String health = this.tHealth.getText();
+    public int getHP() {
+        String health = this.tHP.getText();
         if (health.length() == 0) {
             return 0;
         } else {
-            return Integer.parseInt(this.tHealth.getText());
+            return Integer.parseInt(this.tHP.getText());
         }
     }
 
@@ -536,16 +563,7 @@ public final class DnDView extends JFrame
      * Clears fields
      */
     public void clear() {
-        this.tHealth.setValue(null);
-        this.tNames.setText("");
-    }
-
-    /**
-     * Notify of successful undo.
-     */
-    public void undone(String name) {
-        JOptionPane.showMessageDialog(this.ENTER_FRAME,
-                name + " was successfully removed.");
+        //TODO
     }
 
     /**
@@ -562,8 +580,8 @@ public final class DnDView extends JFrame
     public void enableMainButtons(int lOrdSize, int lHoldsSize, int lMobsSize) {
         this.bHoldTurn.setEnabled(lOrdSize > 0);
         this.bInsertTurn.setEnabled(lHoldsSize > 0);
-        this.bDamage.setEnabled(lMobsSize > 0);
-        this.bHeal.setEnabled(lMobsSize > 0);
+        this.bDamageMob.setEnabled(lMobsSize > 0);
+        this.bHealMob.setEnabled(lMobsSize > 0);
         this.bNext.setEnabled(lOrdSize > 0);
         this.bRemoveMob.setEnabled(lMobsSize > 0);
     }
