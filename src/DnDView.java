@@ -497,6 +497,52 @@ public final class DnDView extends JFrame
         //            this.rbMob.setSelected(true);
         //            this.tNames.grabFocus();
         //        }
+        if (source.equals(this.bNew.getActionCommand())) {
+            this.newAction();
+            this.controller.processNewEvent();
+        } else if (source.equals(this.bExisting.getActionCommand())) {
+            this.existingAction();
+        } else if (source.equals(this.bFinish.getActionCommand())) {
+            this.finishAction();
+        } else if (source.equals(this.bAdd.getActionCommand())) {
+            this.addAction();
+        } else if (source.equals(this.bAddAndSave.getActionCommand())) {
+            this.addAndSaveAction();
+        } else if (source.equals(this.bClear.getActionCommand())) {
+            this.clearAction();
+        } else if (source.equals(this.bRoll.getActionCommand())) {
+            this.rollAction();
+        } else if (source.equals(this.rbMob.getActionCommand())) {
+            this.mobAction();
+        } else if (source.equals(this.rbNPC.getActionCommand())) {
+            this.npcAction();
+        } else if (source.equals(this.rbPlayer.getActionCommand())) {
+            this.playerAction();
+        } else if (source.equals(this.bNext.getActionCommand())) {
+            this.nextAction();
+        } else if (source.equals(this.bHoldTurn.getActionCommand())) {
+            this.holdTurnAction();
+        } else if (source.equals(this.bInsertTurn.getActionCommand())) {
+            this.insertTurnAction();
+        } else if (source.equals(this.bAddMob.getActionCommand())) {
+            this.addMobAction();
+        } else if (source.equals(this.bRemoveMob.getActionCommand())) {
+            this.removeMobAction();
+        } else if (source.equals(this.bHealMob.getActionCommand())) {
+            this.healMobAction();
+        } else if (source.equals(this.bDamageMob.getActionCommand())) {
+            this.damageMobAction();
+        } else if (source.equals(this.bAddNPC.getActionCommand())) {
+            this.addNPCAction();
+        } else if (source.equals(this.bRemoveNPC.getActionCommand())) {
+            this.removeNPCAction();
+        } else if (source.equals(this.bDamageNPC.getActionCommand())) {
+            this.damageNPCAction();
+        } else if (source.equals(this.bHealNPC.getActionCommand())) {
+            this.healNPCAction();
+        } else {
+            System.out.println("ERROR: ACTION NOT IMPLEMENTED");
+        }
         //Action done being processed
         this.setCursor(Cursor.getDefaultCursor());
     }
@@ -557,7 +603,62 @@ public final class DnDView extends JFrame
     }
 
     //EVENT METHOD HELPERS-----------------------------------------------------
-    public void finish() {
+    //    public void finish() {
+    //        this.view = false;
+    //        this.MAIN_FRAME = new JFrame();
+    //        this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
+    //        this.MAIN_FRAME.add(this.MAIN_PANEL);
+    //        this.MAIN_FRAME.getRootPane().setDefaultButton(this.bNext);
+    //        this.MAIN_FRAME.pack();
+    //        this.MAIN_FRAME.setSize(768, 1024);
+    //        this.MAIN_FRAME.setResizable(true);
+    //        this.MAIN_FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //        this.ENTER_FRAME.dispose();
+    //        this.MAIN_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
+    //                this.dim / 2 - this.getSize().height / 2);
+    //        this.MAIN_FRAME.setVisible(true);
+    //
+    //    }
+    //
+    //    public String getTurnOrderSelected() {
+    //        return this.lTurnOrder.getSelectedValue();
+    //    }
+    //
+    //    public String getHoldSelected() {
+    //        return this.lHolds.getSelectedValue();
+    //    }
+    //
+    //    public void setFocusToName() {
+    //        this.tNames.grabFocus();
+    //    }
+    //
+    //    public String addedMobName() {
+    //        return JOptionPane.showInputDialog(this.MAIN_FRAME, "Enter Mob Name: ");
+    //    }
+    //
+    //    public int addedMobHealMobth() {
+    //        int amount = Integer.parseInt(JOptionPane
+    //                .showInputDialog(this.MAIN_FRAME, "Enter Mob Health:"));
+    //        return amount;
+    //    }
+    //ACTION METHODS-----------------------------------------------------------
+    public void newAction() {
+        //Opens ENTER_FORM and allows user to fill in the fields
+        this.rbPlayer.setSelected(true);
+        this.tNames.setEnabled(true);
+        this.tHP.setEnabled(false);
+        this.tMaxHP.setEnabled(false);
+        this.tTempHP.setEnabled(false);
+        this.tInitRoll.setEnabled(true);
+        this.bRoll.setEnabled(false);
+        this.ENTER_FORM.setVisible(true);
+    }
+
+    public void existingAction() {
+        //TODO
+    }
+
+    public void finishAction() {
         this.view = false;
         this.MAIN_FRAME = new JFrame();
         this.MAIN_FRAME.setTitle("Dungeons & Dragons Initiative Order Tracker");
@@ -571,29 +672,78 @@ public final class DnDView extends JFrame
         this.MAIN_FRAME.setLocation(this.dim / 2 - this.getSize().width / 2,
                 this.dim / 2 - this.getSize().height / 2);
         this.MAIN_FRAME.setVisible(true);
+    }
+
+    public void addAction() {
 
     }
 
-    public String getTurnOrderSelected() {
-        return this.lTurnOrder.getSelectedValue();
+    public void addAndSaveAction() {
+
     }
 
-    public String getHoldSelected() {
-        return this.lHolds.getSelectedValue();
+    public void clearAction() {
+
     }
 
-    public void setFocusToName() {
-        this.tNames.grabFocus();
+    public void rollAction() {
+
     }
 
-    public String addedMobName() {
-        return JOptionPane.showInputDialog(this.MAIN_FRAME, "Enter Mob Name: ");
+    public void mobAction() {
+
     }
 
-    public int addedMobHealMobth() {
-        int amount = Integer.parseInt(JOptionPane
-                .showInputDialog(this.MAIN_FRAME, "Enter Mob Health:"));
-        return amount;
+    public void npcAction() {
+
+    }
+
+    public void playerAction() {
+
+    }
+
+    public void nextAction() {
+
+    }
+
+    public void holdTurnAction() {
+
+    }
+
+    public void insertTurnAction() {
+
+    }
+
+    public void addMobAction() {
+
+    }
+
+    public void removeMobAction() {
+
+    }
+
+    public void healMobAction() {
+
+    }
+
+    public void damageMobAction() {
+
+    }
+
+    public void addNPCAction() {
+
+    }
+
+    public void removeNPCAction() {
+
+    }
+
+    public void damageNPCAction() {
+
+    }
+
+    public void healNPCAction() {
+
     }
 
     /**

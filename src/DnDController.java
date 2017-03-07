@@ -58,15 +58,17 @@ public class DnDController {
      * Process events
      */
     public void processNewEvent() {
-        //TODO
+        this.view.newAction();
+        this.updateViewToMatchModel(this.model, this.view);
     }
 
     public void processExistingEvent() {
-        //TODO
+        this.view.existingAction();
+        this.updateViewToMatchModel(this.model, this.view);
     }
 
     public void processFinishEvent() {
-        this.view.finish();
+        this.view.finishAction();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
