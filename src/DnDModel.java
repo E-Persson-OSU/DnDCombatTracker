@@ -40,7 +40,7 @@ public class DnDModel {
         this.lHold = new LinkedList<>();
         this.turns = 1;
         this.enemyIn = false;
-        this.enemies = new DChar("ENEMIES", "", 0, 0, 0, 0, null);
+        this.enemies = new DChar("ENEMIES", "", 0, 0, 0, 0);
     }
 
     //BUTTONS------------------------------------------------------------------
@@ -173,14 +173,11 @@ public class DnDModel {
     private void addToOrder(String name, String type, int initiative, int maxHP,
             int HP, int tempHP, List<String> conditions) {
         if (type.equals("PC")) {
-            this.lPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP,
-                    conditions));
+            this.lPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP));
         } else if (type.equals("NPC")) {
-            this.lNPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP,
-                    conditions));
+            this.lNPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP));
         } else if (type.equals("Mob")) {
-            this.lMob.add(new DChar(name, type, initiative, maxHP, HP, tempHP,
-                    conditions));
+            this.lMob.add(new DChar(name, type, initiative, maxHP, HP, tempHP));
         }
 
         if (!this.enemyIn && type.equals("Mob")) {

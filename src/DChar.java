@@ -29,7 +29,7 @@ public class DChar {
     private List<String> conditions;
 
     public DChar(String name, String type, int initiative, int maxHP, int HP,
-            int tempHP, List<String> conditions) {
+            int tempHP) {
         this.name = name;
         this.type = type;
         this.top = false;
@@ -37,9 +37,6 @@ public class DChar {
         this.maxHP = maxHP;
         this.HP = HP;
         this.tempHP = tempHP;
-        for (String cond : conditions) {
-            this.conditions.add(cond);
-        }
     }
 
     @Override
