@@ -72,6 +72,21 @@ public class DnDController {
         this.updateViewToMatchModel(this.model, this.view);
     }
 
+    public void processAddEvent() {
+        this.view.newAction();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processAddAndSaveEvent() {
+        this.view.newAction();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void processClearEvent() {
+        this.view.newAction();
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
     public void processNextEvent() {
         this.model.next();
         this.updateViewToMatchModel(this.model, this.view);
