@@ -1,5 +1,3 @@
-import java.util.List;
-
 /**
  * Class made to contain character information for DnDCombatTracker.
  *
@@ -26,7 +24,7 @@ public class DChar {
 
     boolean top;
 
-    private List<String> conditions;
+    //private List<String> conditions;
 
     public DChar(String name, String type, int initiative, int maxHP, int HP,
             int tempHP) {
@@ -76,9 +74,9 @@ public class DChar {
         } else {
             name = name + ", " + this.HP + "/" + this.maxHP;
         }
-        for (String cond : this.conditions) {
-            name += " *" + cond + "* ";
-        }
+        //        for (String cond : this.conditions) {
+        //            name += " *" + cond + "* ";
+        //        }
         return name;
     }
 
@@ -92,9 +90,9 @@ public class DChar {
         } else {
             name = name + ", " + this.HP + "/" + this.maxHP;
         }
-        for (String cond : this.conditions) {
-            name += " *" + cond + "* ";
-        }
+        //        for (String cond : this.conditions) {
+        //            name += " *" + cond + "* ";
+        //        }
         return name;
     }
 
@@ -106,9 +104,9 @@ public class DChar {
         this.top = !this.top;
     }
 
-    public List returnStatus() {
-        return this.conditions;
-    }
+    //    public List returnStatus() {
+    //       return this.conditions;
+    //    }
 
     public String type() {
         return this.type;

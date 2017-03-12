@@ -1,3 +1,8 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.LinkedList;
+import java.util.Scanner;
+
 /**
  * The Controller class registers button actions and calls the appropriate model
  * methods.
@@ -73,7 +78,7 @@ public class DnDController {
     }
 
     public void processAddEvent() {
-        this.view.newAction();
+        this.view.addAction();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
@@ -83,7 +88,7 @@ public class DnDController {
     }
 
     public void processClearEvent() {
-        this.view.newAction();
+        this.view.clearAction();
         this.updateViewToMatchModel(this.model, this.view);
     }
 
@@ -146,5 +151,28 @@ public class DnDController {
         this.model.heal(this.view.healthDialog(false),
                 this.view.getMobSelected());
         this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void loadCharacter(File character, int initiative) {
+        try {
+            Scanner in = new Scanner(character);
+            String name = in.nextLine();
+            String type = in.nextLine();
+            int maxHP = in.nextInt();
+            int HP = in.nextInt();
+            int tempHP = in.nextInt();
+            this.model.enter(name, type, initiative, maxHP, HP, tempHP,
+                    new LinkedList<String>());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        this.updateViewToMatchModel(this.model, this.view);
+    }
+
+    public void addCharacter(String name, String type, int initiative,
+            int maxHP, int HP, int tempHP) {
+        this.model.enter(name, type, initiative, maxHP, HP, tempHP,
+                new LinkedList<String>());
     }
 }

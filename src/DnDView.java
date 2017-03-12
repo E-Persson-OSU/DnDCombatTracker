@@ -9,11 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -22,6 +24,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The view component of the DnDCombatTracker.
@@ -33,6 +37,11 @@ import javax.swing.border.Border;
 @SuppressWarnings("serial")
 public final class DnDView extends JFrame
         implements ActionListener, MouseListener {
+
+    /**
+     * JFileChooser
+     */
+    final JFileChooser fc = new JFileChooser();
 
     /**
      * JFrame
@@ -651,11 +660,23 @@ public final class DnDView extends JFrame
         this.tTempHP.setEnabled(false);
         this.tInitRoll.setEnabled(true);
         this.bRoll.setEnabled(false);
+        this.clear();
         this.ENTER_FORM.setVisible(true);
     }
 
     public void existingAction() {
-        //TODO
+        FileFilter filter = new FileNameExtensionFilter("DChar Files", "dchar");
+        this.fc.setFileFilter(filter);
+        int returnVal = this.fc.showOpenDialog(this.ENTER_PANEL);
+        File file;
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = this.fc.getSelectedFile();
+        } else {
+            file = this.fc.getCurrentDirectory();
+        }
+        this.controller.loadCharacter(file, Integer.parseInt(
+                JOptionPane.showInputDialog(this, "Enter Initiative: ")));
     }
 
     public void finishAction() {
@@ -675,7 +696,20 @@ public final class DnDView extends JFrame
     }
 
     public void addAction() {
-
+        String type;
+        if (this.rbPlayer.isSelected()) {
+            type = "PC";
+        } else if (this.rbNPC.isSelected()) {
+            type = "NPC";
+        } else {
+            type = "Mob";
+        }
+        this.controller.addCharacter(this.tNames.getText(), type,
+                Integer.parseInt(this.tInitRoll.getText()),
+                Integer.parseInt(this.tMaxHP.getText()),
+                Integer.parseInt(this.tHP.getText()),
+                Integer.parseInt(this.tTempHP.getText()));
+        this.dispose();
     }
 
     public void addAndSaveAction() {
@@ -683,7 +717,7 @@ public final class DnDView extends JFrame
     }
 
     public void clearAction() {
-
+        this.clear();
     }
 
     public void rollAction() {
@@ -691,15 +725,36 @@ public final class DnDView extends JFrame
     }
 
     public void mobAction() {
-
+        this.rbNPC.setSelected(false);
+        this.rbPlayer.setSelected(false);
+        this.rbMob.setSelected(true);
+        this.tInitRoll.setEnabled(true);
+        this.tMaxHP.setEnabled(true);
+        this.tTempHP.setEnabled(true);
+        this.tHP.setEnabled(true);
+        this.bRoll.setEnabled(true);
     }
 
     public void npcAction() {
-
+        this.rbNPC.setSelected(true);
+        this.rbPlayer.setSelected(false);
+        this.rbMob.setSelected(false);
+        this.tInitRoll.setEnabled(true);
+        this.tMaxHP.setEnabled(true);
+        this.tTempHP.setEnabled(true);
+        this.tHP.setEnabled(true);
+        this.bRoll.setEnabled(true);
     }
 
     public void playerAction() {
-
+        this.rbNPC.setSelected(false);
+        this.rbPlayer.setSelected(true);
+        this.rbMob.setSelected(false);
+        this.tInitRoll.setEnabled(true);
+        this.tMaxHP.setEnabled(false);
+        this.tTempHP.setEnabled(false);
+        this.tHP.setEnabled(false);
+        this.bRoll.setEnabled(false);
     }
 
     public void nextAction() {
@@ -803,7 +858,11 @@ public final class DnDView extends JFrame
      * Clears fields
      */
     public void clear() {
-        //TODO
+        this.tNames.setText("");
+        this.tHP.setText("0");
+        this.tInitRoll.setText("0");
+        this.tMaxHP.setText("0");
+        this.tTempHP.setText("0");
     }
 
     /**

@@ -38,6 +38,8 @@ public class DnDModel {
         this.lMob = new LinkedList<>();
         //this.lDead = new LinkedList<>();
         this.lHold = new LinkedList<>();
+        this.lNPC = new LinkedList<>();
+        this.lPC = new LinkedList<>();
         this.turns = 1;
         this.enemyIn = false;
         this.enemies = new DChar("ENEMIES", "", 0, 0, 0, 0);
@@ -46,7 +48,7 @@ public class DnDModel {
     //BUTTONS------------------------------------------------------------------
     public void enter(String name, String type, int initiative, int maxHP,
             int HP, int tempHP, List<String> conditions) {
-        if (type.equals("player")) {
+        if (type.equals("PC")) {
             this.addToOrder(name, type, initiative, maxHP, HP, tempHP,
                     conditions);
         }
@@ -172,6 +174,8 @@ public class DnDModel {
      */
     private void addToOrder(String name, String type, int initiative, int maxHP,
             int HP, int tempHP, List<String> conditions) {
+        System.out.println(name + " " + type + " " + initiative + " " + maxHP
+                + " " + HP + " " + tempHP);
         if (type.equals("PC")) {
             this.lPC.add(new DChar(name, type, initiative, maxHP, HP, tempHP));
         } else if (type.equals("NPC")) {
